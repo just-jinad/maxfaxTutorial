@@ -1,5 +1,8 @@
 "use client"
 import React from 'react';
+import Image from 'next/image'
+import bodyImage from './images/bodyMaxfax-removebg-preview.png';
+// C:\Users\Lenovo\Desktop\MAXFAX\maxfax\app\components\images\bodyMaxfax-removebg-preview.png
 
 const FocusProgress = () => {
   const focusAreas = [
@@ -28,11 +31,16 @@ const FocusProgress = () => {
       <div className="relative z-10 container mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
         {/* Left Side: Image */}
         <div className="flex justify-center">
-          <img
-            src="https://via.placeholder.com/400" // Replace with actual image URL
-            alt="Focus Image"
-            className="rounded-lg shadow-lg w-full md:w-3/4"
+         
+          <Image
+          src={bodyImage}
+          height={400}
+          width={400}
+          alt="ladyImage"
+          className="rounded-lg shadow-lg w-full md:w-3/4"
           />
+
+          
         </div>
 
         {/* Right Side: Focus Progress */}

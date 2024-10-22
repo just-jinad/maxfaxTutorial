@@ -6,7 +6,7 @@ const LearnTogether = () => {
     <section className="relative bg-white py-24 px-6 overflow-hidden">
       {/* Background Waves SVG */}
       <div className="absolute inset-0 z-0 pointer-events-none">
-        <svg
+        {/* <svg
           className="absolute bottom-0 left-0 w-full h-full"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 1440 320"
@@ -15,8 +15,10 @@ const LearnTogether = () => {
             fill="#f3f4f6"
             d="M0,160L48,165.3C96,171,192,181,288,176C384,171,480,149,576,122.7C672,96,768,64,864,80C960,96,1056,160,1152,160C1248,160,1344,96,1392,64L1440,32V320H0V160Z"
           ></path>
-        </svg>
+        </svg> */}
       </div>
+
+    
 
       {/* Circular Content Section */}
       <div className="relative z-10 mx-auto text-center bg-gray-100 p-8 md:p-10 lg:p-16 rounded-full w-96 shadow-lg">

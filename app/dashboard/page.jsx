@@ -1,12 +1,12 @@
-"use client"
-import CreateQuiz from '../admin/page'
+// "use client"
+// import CreateQuiz from '../admin/page'
 
-const page = ()=>{
-    return(
-        <>
-        <ClientComponent>
-        <CreateQuiz />
-      </ClientComponent>
-        </>
-    )
-}
+// const page = ()=>{
+//     return(
+//         <>
+//         <ClientComponent>
+//         <CreateQuiz />
+//       </ClientComponent>
+//         </>
+//     )
+// }
