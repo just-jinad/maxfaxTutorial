@@ -1,7 +1,7 @@
 import Image from "next/image";
 import FocusProgress from "./components/FocusProgress.jsx";
 import LearnTogether from "./components/LearnTogether.jsx";
-import HeroImage from './components/images/heroMaxfaxx.png';
+import HeroImage from './components/images/hero.png';
 import Footer from "./components/Footer.jsx";
 export default function Home() {
   return (

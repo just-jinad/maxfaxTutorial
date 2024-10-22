@@ -1,8 +1,8 @@
 "use client"
 import React from 'react';
 import Image from 'next/image'
-import bodyImage from './images/bodyMaxfax-removebg-preview.png';
-// C:\Users\Lenovo\Desktop\MAXFAX\maxfax\app\components\images\bodyMaxfax-removebg-preview.png
+import bodyImage from './images/body.png';
+
 
 const FocusProgress = () => {
   const focusAreas = [

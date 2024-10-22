@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "aos": "^2.3.4",
     "bcryptjs": "^2.4.3",
     "dotenv": "^16.4.5",
     "jsonwebtoken": "^9.0.2",
