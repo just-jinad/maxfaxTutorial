@@ -55,6 +55,7 @@ export default function Home() {
                 alt="Tutor Image"
                 width={400}
                 height={400}
+                priority={true}
                 className="w-full max-w-sm mx-auto rounded-lg"
               />
            

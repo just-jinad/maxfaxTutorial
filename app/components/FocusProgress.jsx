@@ -36,6 +36,7 @@ const FocusProgress = () => {
           src={bodyImage}
           height={400}
           width={400}
+          priority={true}
           alt="ladyImage"
           className="rounded-lg shadow-lg w-full md:w-3/4"
           />
