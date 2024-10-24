@@ -47,7 +47,7 @@ export function Footer() {
       <div className="container flex flex-col mx-auto">
         <div className="flex w-full py-10 mb-5 md:mb-20 flex-col justify-center items-center bg-gray-900 max-w-6xl mx-auto rounded-2xl p-5">
           <h2 className="text-2xl md:text-3xl text-center font-bold text-white">
-            Daily Bible Verse
+            Random facts
           </h2>
           <p className="md:w-7/12 text-center my-3 text-base text-white">
             {bibleVerse.verse || "Loading..."}
@@ -64,10 +64,10 @@ export function Footer() {
             target="_blank"
             className="text-green-800 text-xl font-semibold"
           >
-            ORMBGO 
+            Maxfax 
           </a>
           <ul className="flex justify-center my-4 md:my-0 w-max mx-auto items-center gap-4">
-            PO Box 821 Boca Raton, <br /> FL 33429 561-668-3925
+            LAUTEACH Area Ogbomoso, Oyo state
           </ul>
           <div className="flex w-fit justify-center gap-2">
             <a
@@ -101,7 +101,7 @@ export function Footer() {
           </div>
         </div>
         <p className="text-center mt-12 font-normal text-gray-700">
-          Copyright © {CURRENT_YEAR} ORMBGO (One Root Many Branches Global Outreach, Inc.)
+          Copyright © {CURRENT_YEAR} Maxfax (Redefinning the Learning Experience)
           | All Rights Reserved.
         </p>
       </div>
