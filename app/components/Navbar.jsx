@@ -1,8 +1,9 @@
-"use client"
-import React, { useState } from 'react';
-import Image from 'next/image';
-import logo from './images/Gemini.png';
-import { FaBars, FaTimes } from 'react-icons/fa';
+"use client";
+import React, { useState } from "react";
+import Image from "next/image";
+import logo from "./images/Gemini.png";
+import { FaBars, FaTimes } from "react-icons/fa";
+import Link from "next/link";
 
 const Navbar = () => {
   const [navOpen, setNavOpen] = useState(false);
@@ -17,13 +18,15 @@ const Navbar = () => {
         {/* Logo and Icon */}
         <div className="flex items-center space-x-2">
           <Image
-            src={logo} 
+            src={logo}
             alt="Maxfax Icon"
             width={60}
             height={60}
             className="rounded-full"
           />
-          <span className="font-bold text-lg sm:text-xl md:text-2xl">Maxfax Tutorial</span>
+          <span className="font-bold text-lg sm:text-xl md:text-2xl">
+            Maxfax Tutorial
+          </span>
         </div>
 
         {/* Menu Icon for Small and Medium Screens */}
@@ -38,18 +41,19 @@ const Navbar = () => {
 
         {/* Links for Large Screens */}
         <nav className="hidden lg:flex items-center space-x-6">
-          <a
-            href="#"
+          <Link
             className="text-base hover:bg-gray-100 rounded-md px-4 py-2 transition-all duration-300"
+            href={"/login"}
           >
             Login Admin
-          </a>
-          <a
-            href="#"
+          </Link>
+
+          <Link
+            href={"/login"}
             className="text-base hover:bg-gray-100 rounded-md px-4 py-2 transition-all duration-300"
           >
             Login Student
-          </a>
+          </Link>
         </nav>
       </div>
 
