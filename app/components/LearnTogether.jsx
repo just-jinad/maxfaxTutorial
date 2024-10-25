@@ -2,6 +2,7 @@
 import React, { useEffect } from 'react';
 import Image from 'next/image';
 import AOS from 'aos';
+import bottomImage from './images/bottom2.png';
 import 'aos/dist/aos.css'; // Import AOS styles
 
 const LearnTogether = () => {
@@ -52,7 +53,7 @@ const LearnTogether = () => {
           data-aos="fade-left"
         >
           <Image
-            src="/path-to-your-image.jpg" // Replace with your image path
+            src={bottomImage}
             alt="Learning Image"
             width={400}
             height={400}
