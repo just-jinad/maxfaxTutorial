@@ -3,6 +3,7 @@
 import Image from "next/image";
 import FocusProgress from "./components/FocusProgress.jsx";
 import LearnTogether from "./components/LearnTogether.jsx";
+import Navbar from "./components/Navbar.jsx";
 import HeroImage from './components/images/hero.png';
 import Footer from "./components/Footer.jsx";
 import AOS from 'aos';
@@ -17,6 +18,7 @@ export default function Home() {
   }, []);
   return (
     <>
+    <Navbar/>
       <div className="relative overflow-hidden bg-white">
         {/* Floating decorative shapes */}
         <div  className="absolute top-0 left-0 transform -translate-x-1/2 -translate-y-1/2 w-40 h-40 bg-blue-100 rounded-full z-0"></div>
