@@ -66,7 +66,7 @@ export function Footer() {
           >
             Maxfax 
           </a>
-          <ul className="flex justify-center my-4 md:my-0 w-max mx-auto items-center gap-4">
+          <ul className="flex justify-center font-bold my-4 md:my-0 w-max mx-auto items-center gap-4">
             LAUTEACH Area Ogbomoso, Oyo state
           </ul>
           <div className="flex w-fit justify-center gap-2">
