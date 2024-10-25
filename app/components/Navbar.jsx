@@ -60,18 +60,19 @@ const Navbar = () => {
       {/* Mobile Dropdown Menu for Small and Medium Screens */}
       {navOpen && (
         <div className="lg:hidden bg-white shadow-md border-t border-gray-200">
-          <a
-            href="#"
-            className="block text-sm text-gray-900 hover:bg-gray-100 rounded-md px-4 py-2 transition-all duration-300"
+          <Link
+            className="text-base hover:bg-gray-100 rounded-md px-4 py-2 transition-all duration-300"
+            href={"/login"}
           >
             Login Admin
-          </a>
-          <a
-            href="#"
-            className="block text-sm text-gray-900 hover:bg-gray-100 rounded-md px-4 py-2 transition-all duration-300"
+          </Link>
+
+          <Link
+            href={"/login"}
+            className="text-base hover:bg-gray-100 rounded-md px-4 py-2 transition-all duration-300"
           >
             Login Student
-          </a>
+          </Link>
         </div>
       )}
     </header>
