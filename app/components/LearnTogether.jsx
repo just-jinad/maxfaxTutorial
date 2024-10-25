@@ -55,8 +55,8 @@ const LearnTogether = () => {
           <Image
             src={bottomImage}
             alt="Learning Image"
-            width={400}
-            height={400}
+            width={200}
+            height={200}
             className="rounded-lg shadow-lg hover:scale-105 transition-transform duration-500 ease-in-out"
           />
         </div>
