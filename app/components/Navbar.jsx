@@ -1,6 +1,7 @@
 "use client"
 import React, { useState } from 'react';
 import Image from 'next/image';
+import logo from './images/Gemini.png';
 import { FaBars, FaTimes } from 'react-icons/fa';
 
 const Navbar = () => {
@@ -16,10 +17,10 @@ const Navbar = () => {
         {/* Logo and Icon */}
         <div className="flex items-center space-x-2">
           <Image
-            src="/maxfax-icon.png" // Replace with your Maxfax icon image path
+            src={logo} 
             alt="Maxfax Icon"
-            width={40}
-            height={40}
+            width={60}
+            height={60}
             className="rounded-full"
           />
           <span className="font-bold text-lg sm:text-xl md:text-2xl">Maxfax Tutorial</span>
