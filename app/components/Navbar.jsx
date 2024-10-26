@@ -49,7 +49,7 @@ const Navbar = () => {
           </Link>
 
           <Link
-            href={"/login"}
+            href={"/canLogin"}
             className="text-base hover:bg-gray-100 rounded-md px-4 py-2 transition-all duration-300"
           >
             Login Student
