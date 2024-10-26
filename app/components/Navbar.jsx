@@ -13,7 +13,7 @@ const Navbar = () => {
   };
 
   return (
-    <header className="bg-white text-gray-900 shadow-lg ">
+    <header className="bg-white text-gray-900 shadow-lg">
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
         {/* Logo and Icon */}
         <div className="flex items-center space-x-2">
@@ -43,6 +43,13 @@ const Navbar = () => {
         <nav className="hidden lg:flex items-center space-x-6">
           <Link
             className="text-base hover:bg-gray-100 rounded-md px-4 py-2 transition-all duration-300"
+            href={"/signup"}
+          >
+            Signup Admin
+          </Link>
+
+          <Link
+            className="text-base hover:bg-gray-100 rounded-md px-4 py-2 transition-all duration-300"
             href={"/login"}
           >
             Login Admin
@@ -59,20 +66,33 @@ const Navbar = () => {
 
       {/* Mobile Dropdown Menu for Small and Medium Screens */}
       {navOpen && (
-        <div className="lg:hidden bg-white shadow-md border-t border-gray-200">
-          <Link
-            className="text-base hover:bg-gray-100 rounded-md px-4 py-2 transition-all duration-300"
-            href={"/login"}
-          >
-            Login Admin
-          </Link>
-
-          <Link
-            href={"/login"}
-            className="text-base hover:bg-gray-100 rounded-md px-4 py-2 transition-all duration-300"
-          >
-            Login Student
-          </Link>
+        <div className="lg:hidden bg-white shadow-md border-t border-gray-200 p-4">
+          <ul className="flex flex-col space-y-3">
+            <li>
+              <Link
+                className="block text-base hover:bg-gray-100 rounded-md px-4 py-2 transition-all duration-300"
+                href={"/signup"}
+              >
+                Signup Admin
+              </Link>
+            </li>
+            <li>
+              <Link
+                className="block text-base hover:bg-gray-100 rounded-md px-4 py-2 transition-all duration-300"
+                href={"/login"}
+              >
+                Login Admin
+              </Link>
+            </li>
+            <li>
+              <Link
+                href={"/canLogin"}
+                className="block text-base hover:bg-gray-100 rounded-md px-4 py-2 transition-all duration-300"
+              >
+                Login Student
+              </Link>
+            </li>
+          </ul>
         </div>
       )}
     </header>
