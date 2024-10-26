@@ -68,6 +68,7 @@ const Page = () => {
             <input
               className="w-full px-4 py-2 rounded-lg border border-teal-200 placeholder-teal-400 focus:outline-none focus:ring-2 focus:ring-teal-500"
               id="username"
+              required
               placeholder="Enter your username"
               value={user.username}
               onChange={(e) => setUser({ ...user, username: e.target.value })}
@@ -81,6 +82,7 @@ const Page = () => {
               className="w-full px-4 py-2 rounded-lg border border-teal-200 placeholder-teal-400 focus:outline-none focus:ring-2 focus:ring-teal-500"
               id="password"
               type="password"
+              required
               placeholder="Enter your password"
               value={user.password}
               onChange={(e) => setUser({ ...user, password: e.target.value })}

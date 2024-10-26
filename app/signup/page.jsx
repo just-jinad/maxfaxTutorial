@@ -13,7 +13,8 @@ export default function SignupPage() {
         username: "",
     });
 
-    const onSignup = () => {
+    const onSignup = (e) => {
+        e.preventDefault();
         axios.post("/api/auth/signup", user)
             .then((res) => {
                 console.log(res)
@@ -46,7 +47,11 @@ export default function SignupPage() {
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100 p-3">
-            <div className="w-full max-w-md bg-white shadow-lg rounded-lg p-8">
+
+
+            <form
+            onSubmit={onSignup}
+            className="w-full max-w-md bg-white shadow-lg rounded-lg p-8">
                 <h2 className="text-2xl font-semibold text-gray-800 text-center mb-6">Admin MaxFax</h2>
                 
                 <div className="mb-4">
@@ -54,6 +59,7 @@ export default function SignupPage() {
                     <input
                         id="username"
                         type="text"
+                        required
                         value={user.username}
                         onChange={(e) => setUser({ ...user, username: e.target.value })}
                         placeholder="Username"
@@ -65,7 +71,8 @@ export default function SignupPage() {
                     <label htmlFor="email" className="block text-gray-600 mb-1">Email</label>
                     <input
                         id="email"
-                        type="text"
+                        type="email"
+                        required
                         value={user.email}
                         onChange={(e) => setUser({ ...user, email: e.target.value })}
                         placeholder="Email"
@@ -76,6 +83,7 @@ export default function SignupPage() {
                 <div className="mb-6">
                     <label htmlFor="password" className="block text-gray-600 mb-1">Password</label>
                     <input
+                        required
                         id="password"
                         type="password"
                         value={user.password}
@@ -86,7 +94,6 @@ export default function SignupPage() {
                 </div>
 
                 <button
-                    onClick={onSignup}
                     className="w-full py-2 bg-teal-700 text-white font-semibold rounded-lg hover:bg-teal-600 transition duration-300"
                 >
                     Sign Up
@@ -98,7 +105,9 @@ export default function SignupPage() {
                         Visit login page
                     </Link>
                 </p>
-            </div>
+            </form>
+
+
         </div>
     );
 }

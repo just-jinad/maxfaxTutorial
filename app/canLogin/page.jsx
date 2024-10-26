@@ -29,6 +29,7 @@ const PinEntryPage = () => {
                 <form onSubmit={handleSubmit} className="flex flex-col items-center">
                     <input
                         type="text"
+                        required
                         value={pin}
                         onChange={(e) => setPin(e.target.value)}
                         placeholder="Enter Pin"
