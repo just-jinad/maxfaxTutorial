@@ -33,10 +33,7 @@ export default function Home() {
                 About Maxfax Tutorials
               </h1>
               <p className="text-gray-600" data-aos="fade-up">
-                At Divi Tutoring, we provide top-notch educational support for
-                students of all ages. Whether you're looking to excel in
-                academics, improve a specific skill, or prepare for an upcoming
-                exam, we have a solution for you.
+              At MaxFax, we deliver exceptional educational support tailored to students of all ages. Whether you're aiming to excel academically, enhance a particular skill, or prepare for an important exam, we have the right solution to help you succeed.
               </p>
               <p className="text-gray-600" data-aos="fade-up">
                 Our team of professional tutors will work with you to create a

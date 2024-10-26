@@ -22,7 +22,9 @@ const Page = () => {
             position: 'top-center',
             style: { backgroundColor: 'green', color: 'white' }
           });
-          // router.push("/dashboard");
+            setTimeout(()=>{
+              router.push("/dashboard");
+            },2000)
         }
       }).catch((err) => {
         console.log(err)
