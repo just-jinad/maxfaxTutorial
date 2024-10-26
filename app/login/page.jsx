@@ -13,19 +13,23 @@ const Page = () => {
 
     axios.post("/api/auth/login", user)
       .then((res) => {
+        console.log(res)
+       
         if (res.status === 200) {
           let token = res.data.token;
           localStorage.setItem('token', token);
           toast.success('Login successful', {
-            position: 'top-center'
+            position: 'top-center',
+            style: { backgroundColor: 'green', color: 'white' }
           });
-          router.push("/dashboard");
+          // router.push("/dashboard");
         }
       }).catch((err) => {
         console.log(err)
-        const errorMessage = err.response?.status === 401 
-          ? 'Incorrect username or password' 
-          : 'Network Error! Please try again.';
+        console.log(err.response.data.error)
+        // console.log(err.response?.status)
+        const errorMessage = err.response.data.error
+        
 
         toast.error(errorMessage, {
           position: 'top-center',
