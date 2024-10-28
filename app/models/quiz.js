@@ -10,6 +10,8 @@ const questionSchema = new mongoose.Schema({
 
 const quizSchema = new mongoose.Schema({
     title: String,
+    subject: String, // New field for the subject
+    pin: { type: String, unique: true }, // New field for PIN
     questions: [questionSchema],
     createdAt: { type: Date, default: Date.now },
 });
