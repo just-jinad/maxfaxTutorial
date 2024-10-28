@@ -7,7 +7,7 @@ export async function GET(request, { params }) {
 
     try {
         const { quizId } = params;
-        
+
         const quiz = await Quiz.findById(quizId);
         if (!quiz) {
             return NextResponse.json({ error: "Quiz not found." }, { status: 404 });
@@ -15,9 +15,11 @@ export async function GET(request, { params }) {
 
         return NextResponse.json({
             title: quiz.title,
+            subject: quiz.subject, // Include subject here
             questions: quiz.questions.map(q => ({
-                text: q.text,
-                options: q.options
+                questionText: q.questionText, // Use correct field name
+                options: q.options,
+                questionType: q.questionType, // Optionally include type
             }))
         });
     } catch (error) {
