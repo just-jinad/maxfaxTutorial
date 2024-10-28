@@ -31,6 +31,8 @@ export default function Home() {
             <div className="space-y-4">
               <h1 className="text-4xl font-bold text-gray-900">
                 About Maxfax Tutorials
+
+          
               </h1>
               <p className="text-gray-600" data-aos="fade-up">
               At MaxFax, we deliver exceptional educational support tailored to students of all ages. Whether you're aiming to excel academically, enhance a particular skill, or prepare for an important exam, we have the right solution to help you succeed.
