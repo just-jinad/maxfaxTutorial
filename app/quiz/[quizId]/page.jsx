@@ -3,8 +3,10 @@ import React, { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 
 const QuizPage = () => {
+    const router = useRouter();
     const { quizId } = useParams();
     const [quizData, setQuizData] = useState(null);
+    const [studentName, setStudentName] = useState("");
     const [error, setError] = useState("");
     const [selectedAnswers, setSelectedAnswers] = useState({});
     const [score, setScore] = useState(null); // Stores the student's score after submission
@@ -39,13 +41,19 @@ const QuizPage = () => {
 
     // Submit quiz and calculate score
     const handleSubmit = async () => {
+        if (!studentName) {
+            setError("Please enter your name before submitting the quiz.");
+            return;
+        }
+        
         try {
             const response = await fetch(`/api/quiz/${quizId}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ selectedAnswers }),
+                // Updated to send studentName instead of name
+                body: JSON.stringify({ studentName, selectedAnswers }),
             });
 
             const result = await response.json();
@@ -70,44 +78,63 @@ const QuizPage = () => {
 
     return (
         <div className="min-h-screen p-6 bg-gray-50">
-            <h1 className="text-3xl font-bold text-center mb-4">{quizData.title}</h1>
-            <h2 className="text-xl text-center text-gray-700 mb-6">Subject: {quizData.subject}</h2>
-            
-            {quizData.questions.map((question, index) => (
-                <div key={index} className="mb-6 p-4 bg-white rounded shadow">
-                    <h2 className="font-semibold text-lg mb-2">{question.questionText}</h2>
-                    <ul>
-                        {question.options.map((option, i) => (
-                            <li key={i} className="mt-2">
-                                <label className="flex items-center">
-                                    <input
-                                        type="radio"
-                                        name={`question-${index}`}
-                                        value={option}
-                                        checked={selectedAnswers[index] === option}
-                                        onChange={() => handleOptionChange(index, option)}
-                                        className="mr-2"
-                                    />
-                                    {option}
-                                </label>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            ))}
+            <div className="max-w-lg mx-auto">
+                <h1 className="text-3xl font-bold text-center mb-4">{quizData.title}</h1>
+                <h2 className="text-xl text-center text-gray-700 mb-6">Subject: {quizData.subject}</h2>
 
-            {score !== null ? (
-                <p className="text-center text-xl font-semibold mt-4">
-                    Your Score: {score} / {quizData.questions.length * 2} {/* Each question is worth 2 points */}
-                </p>
-            ) : (
-                <button
-                    className="w-full mt-4 py-2 px-4 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-                    onClick={handleSubmit}
-                >
-                    Submit Quiz
-                </button>
-            )}
+                {/* Student Name Input */}
+                <div className="mb-4">
+                    <label className="block text-gray-700 font-semibold mb-2" htmlFor="studentName">
+                        Enter your name:
+                    </label>
+                    <input
+                        type="text"
+                        id="studentName"
+                        value={studentName}
+                        onChange={(e) => setStudentName(e.target.value)}
+                        placeholder="Your Name"
+                        className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+                    />
+                </div>
+
+                {/* Quiz Questions */}
+                {quizData.questions.map((question, index) => (
+                    <div key={index} className="mb-6 p-4 bg-white rounded shadow">
+                        <h2 className="font-semibold text-lg mb-2">{question.questionText}</h2>
+                        <ul>
+                            {question.options.map((option, i) => (
+                                <li key={i} className="mt-2">
+                                    <label className="flex items-center">
+                                        <input
+                                            type="radio"
+                                            name={`question-${index}`}
+                                            value={option}
+                                            checked={selectedAnswers[index] === option}
+                                            onChange={() => handleOptionChange(index, option)}
+                                            className="mr-2"
+                                        />
+                                        {option}
+                                    </label>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                ))}
+
+                {/* Display Score or Submit Button */}
+                {score !== null ? (
+                    <p className="text-center text-xl font-semibold mt-4">
+                        Your Score: {score} / {quizData.questions.length * 2} {/* Each question is worth 2 points */}
+                    </p>
+                ) : (
+                    <button
+                        className="w-full mt-4 py-2 px-4 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+                        onClick={handleSubmit}
+                    >
+                        Submit Quiz
+                    </button>
+                )}
+            </div>
         </div>
     );
 };

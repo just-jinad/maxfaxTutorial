@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { connect } from '@/app/utils/dbConnect';
 import Quiz from '../../../models/quiz';
+import Submission from '../../../models/submission';
 
 // GET request to retrieve quiz data
 export async function GET(request, { params }) {
@@ -32,12 +33,13 @@ export async function GET(request, { params }) {
 }
 
 // POST request to submit answers and calculate score
+const submissions = [];
 export async function POST(request, { params }) {
     await connect();
 
     try {
         const { quizId } = params;
-        const { selectedAnswers } = await request.json();
+        const { studentName, selectedAnswers } = await request.json();
 
         // Fetch the quiz to get correct answers
         const quiz = await Quiz.findById(quizId);
@@ -53,11 +55,16 @@ export async function POST(request, { params }) {
             }
         });
 
-        // Return calculated score
+        // Store the submission in the database
+        const newSubmission = new Submission({ studentName, score, quizId });
+        await newSubmission.save(); // Save to MongoDB
+
+        // Return calculated score without saving it
         return NextResponse.json({
             message: "Quiz submitted successfully.",
+            studentName,
             score,
-            totalScore: quiz.questions.length * 2, // Max score based on 2 points per question
+            totalScore: quiz.questions.length * 2,
         });
     } catch (error) {
         console.error("Error submitting quiz:", error);

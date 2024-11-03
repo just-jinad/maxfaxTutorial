@@ -27,7 +27,7 @@ const PinEntryPage = () => {
             const data = await response.json();
             if (response.ok) {
                 console.log("Access granted:", data);
-              router.push(`/quiz/${data.quizId}`);
+              router.push(`/quiz/${data.quizId}?name=${encodeURIComponent(name)}`);
                 // Redirect to quiz page or display quiz instructions
             } else {
                 setError(data.error || "Failed to verify pin.");
