@@ -4,15 +4,13 @@ import { NextResponse } from 'next/server';
 import Submission from '../../../models/submission';
 
 export async function GET(request) {
-    await connect(); // Ensure the database connection is established
-
+    await connect();
+    
     try {
-        // Fetch all submissions from the database
-        const submissions = await Submission.find().populate('quizId', 'title'); // Optionally populate quiz title
-
+        const submissions = await Submission.find({}).sort({ timestamp: -1 });
         return NextResponse.json(submissions);
     } catch (error) {
-        console.error("Error retrieving submissions:", error);
-        return NextResponse.json({ error: "Failed to fetch submissions." }, { status: 500 });
+        console.error('Error fetching submissions:', error);
+        return NextResponse.json({ error: 'Error fetching submissions' }, { status: 500 });
     }
 }
