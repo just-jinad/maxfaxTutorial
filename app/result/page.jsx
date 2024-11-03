@@ -42,7 +42,7 @@ const AdminSubmissions = () => {
                             <li key={index} className="mb-4 p-4 bg-white rounded shadow">
                                 <p><strong>Name:</strong> {submission.studentName}</p>
                                 <p><strong>Score:</strong> {submission.score}</p>
-                                <p>Timestamp: {new Date(submission.timestamp).toLocaleString()}</p>
+                                {/* <p>Timestamp: {new Date(submission.timestamp).toLocaleString()}</p> */}
                                 {/* Optionally, show the quiz title if populated */}
                                 <p><strong>Quiz:</strong> {submission.quizId?.title || 'N/A'}</p>
                             </li>
