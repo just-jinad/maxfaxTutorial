@@ -9,20 +9,14 @@ const AdminSubmissions = () => {
         const fetchSubmissions = async () => {
             try {
                 const response = await fetch("/api/quiz/result");
+                const data = await response.json();
+                console.log('API Response:', data);
 
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    setError(errorData.error || "Failed to load submissions.");
-                    console.error("Fetch error:", errorData);
-                    return;
+                if (response.ok) {
+                    setSubmissions(data.data); // Adjusted based on the API response
+                } else {
+                    setError(data.error || "Failed to load submissions.");
                 }
-
-                const result = await response.json();
-                console.log("Fetched data:", result);
-
-                // Extract the submissions array from result.data
-                setSubmissions(Array.isArray(result.data) ? result.data : []);
-                
             } catch (error) {
                 console.error("Error fetching submissions:", error);
                 setError("An unexpected error occurred.");
@@ -48,8 +42,6 @@ const AdminSubmissions = () => {
                             <li key={index} className="mb-4 p-4 bg-white rounded shadow">
                                 <p><strong>Name:</strong> {submission.studentName}</p>
                                 <p><strong>Score:</strong> {submission.score}</p>
-                                <p><strong>Timestamp:</strong> {new Date(submission.timestamp).toLocaleString()}</p>
-                                <p><strong>Quiz:</strong> {submission.quizId?.title || 'N/A'}</p>
                             </li>
                         ))}
                     </ul>
