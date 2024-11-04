@@ -75,6 +75,8 @@ export function Footer() {
               target="_blank"
               className="text-gray-500 hover:text-gray-700 transition-colors"
             >
+              <b className="text-center"> Whatsapp Line</b>
+               <p className="text-center">+234 8137619824</p>
               <i className="fa-brands fa-twitter text-lg" />
             </a>
             <a
