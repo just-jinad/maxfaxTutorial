@@ -1,4 +1,4 @@
-"use client";
+"use client"; // Ensure this is a client component
 import React, { useEffect, useState } from "react";
 
 const AdminSubmissions = () => {
@@ -10,10 +10,9 @@ const AdminSubmissions = () => {
             try {
                 const response = await fetch("/api/quiz/result");
                 const data = await response.json();
-                console.log('API Response:', data);
 
                 if (response.ok) {
-                    setSubmissions(data.data); // Adjusted based on the API response
+                    setSubmissions(data.data); // Set submissions data
                 } else {
                     setError(data.error || "Failed to load submissions.");
                 }
