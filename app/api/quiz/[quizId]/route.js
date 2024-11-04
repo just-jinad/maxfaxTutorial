@@ -33,8 +33,8 @@ export async function GET(request, { params }) {
 }
 
 // POST request to submit answers and calculate score
-const submissions = [];
 export async function POST(request, { params }) {
+    // Connect to the database
     await connect();
 
     try {
@@ -55,11 +55,11 @@ export async function POST(request, { params }) {
             }
         });
 
-        // Store the submission in the database
-        const newSubmission = new Submission({ studentName, score, quizId });
-        await newSubmission.save(); // Save to MongoDB
+        // Create and save the new submission to MongoDB
+        const newSubmission = await Submission.create({ studentName, score, quizId });
+        console.log("New submission saved:", newSubmission);
 
-        // Return calculated score without saving it
+        // Return the calculated score and submission details
         return NextResponse.json({
             message: "Quiz submitted successfully.",
             studentName,
