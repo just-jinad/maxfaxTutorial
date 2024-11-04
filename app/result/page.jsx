@@ -1,53 +1,49 @@
-"use client"; // Ensure this is a client component
-import React, { useEffect, useState } from "react";
+"use client"; // Ensure this component runs on the client side
+import { useEffect, useState } from 'react';
 
-const AdminSubmissions = () => {
+const QuizSubmissions = ({ quizId }) => {
     const [submissions, setSubmissions] = useState([]);
-    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchSubmissions = async () => {
             try {
-                const response = await fetch("/api/quiz/result");
-                const data = await response.json();
-
-                if (response.ok) {
-                    setSubmissions(data.data); // Set submissions data
-                } else {
-                    setError(data.error || "Failed to load submissions.");
+                const response = await fetch(`/api/quiz/${quizId}/submissions`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch submissions');
                 }
+                const data = await response.json();
+                setSubmissions(data);
             } catch (error) {
                 console.error("Error fetching submissions:", error);
-                setError("An unexpected error occurred.");
+            } finally {
+                setLoading(false);
             }
         };
 
         fetchSubmissions();
-    }, []);
+    }, [quizId]);
 
-    if (error) {
-        return <p className="text-red-500 text-center">{error}</p>;
+    if (loading) {
+        return <div>Loading...</div>;
     }
 
     return (
-        <div className="min-h-screen p-6 bg-gray-50">
-            <div className="max-w-lg mx-auto">
-                <h1 className="text-3xl font-bold text-center mb-4">Quiz Submissions</h1>
-                {submissions.length === 0 ? (
-                    <p className="text-center">No submissions yet.</p>
+        <div>
+            <h2>Quiz Submissions</h2>
+            <ul>
+                {submissions.length > 0 ? (
+                    submissions.map((submission) => (
+                        <li key={submission._id}>
+                            Student Name: {submission.studentName || 'Unknown'} - Score: {submission.score || 'N/A'}
+                        </li>
+                    ))
                 ) : (
-                    <ul>
-                        {submissions.map((submission, index) => (
-                            <li key={index} className="mb-4 p-4 bg-white rounded shadow">
-                                <p><strong>Name:</strong> {submission.studentName}</p>
-                                <p><strong>Score:</strong> {submission.score}</p>
-                            </li>
-                        ))}
-                    </ul>
+                    <li>No submissions found for this quiz.</li>
                 )}
-            </div>
+            </ul>
         </div>
     );
 };
 
-export default AdminSubmissions;
+export default QuizSubmissions;
