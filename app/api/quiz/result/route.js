@@ -10,7 +10,7 @@ export async function GET(request) {
         console.log('Database connected successfully in production');
 
         // Fetch all submissions with only studentName, score, and subject fields
-        const submissions = await Submission.find({}, 'studentName score subject').sort({ timestamp: -1 });
+        const submissions = await Submission.find()
 
         // Check if submissions are retrieved
         if (!submissions || submissions.length === 0) {
