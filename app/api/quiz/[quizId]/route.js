@@ -51,12 +51,17 @@ export async function POST(request, { params }) {
       return NextResponse.json({ error: "Quiz not found." }, { status: 404 });
     }
 
-    // Calculate score: 2 points per correct answer
+    // Calculate score and determine correctness per question
     let score = 0;
-    quiz.questions.forEach((question, index) => {
-      if (selectedAnswers[index] === question.correctAnswer) {
-        score += 2;
-      }
+    const results = quiz.questions.map((question, index) => {
+      const isCorrect = selectedAnswers[index] === question.correctAnswer;
+      if (isCorrect) score += 2; // 2 points per correct answer
+      return {
+        questionText: question.questionText,
+        correctAnswer: question.correctAnswer,
+        selectedAnswer: selectedAnswers[index],
+        isCorrect,
+      };
     });
 
     // Create and save the new submission to MongoDB
@@ -67,12 +72,13 @@ export async function POST(request, { params }) {
     });
     console.log("New submission saved:", newSubmission);
 
-    // Return the calculated score and submission details
+    // Return the calculated score, results, and detailed feedback
     return NextResponse.json({
       message: "Quiz submitted successfully.",
       studentName,
       score,
       totalScore: quiz.questions.length * 2,
+      results,
     });
   } catch (error) {
     console.error("Error submitting quiz:", error);
