@@ -41,12 +41,12 @@ const Navbar = () => {
 
         {/* Links for Large Screens */}
         <nav className="hidden lg:flex items-center space-x-6">
-          <Link
+          {/* <Link
             className="text-base hover:bg-gray-100 rounded-md px-4 py-2 transition-all duration-300"
             href={"/signup"}
           >
             Signup Admin
-          </Link>
+          </Link> */}
 
           <Link
             className="text-base hover:bg-gray-100 rounded-md px-4 py-2 transition-all duration-300"
@@ -69,12 +69,12 @@ const Navbar = () => {
         <div className="lg:hidden bg-white shadow-md border-t border-gray-200 p-4">
           <ul className="flex flex-col space-y-3">
             <li>
-              <Link
+              {/* <Link
                 className="block text-base hover:bg-gray-100 rounded-md px-4 py-2 transition-all duration-300"
                 href={"/signup"}
               >
                 Signup Admin
-              </Link>
+              </Link> */}
             </li>
             <li>
               <Link
