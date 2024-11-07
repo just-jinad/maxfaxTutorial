@@ -10,7 +10,9 @@ const QuizPage = () => {
     const [studentName, setStudentName] = useState("");
     const [error, setError] = useState("");
     const [selectedAnswers, setSelectedAnswers] = useState({});
-    const [score, setScore] = useState(null); // Stores the student's score after submission
+    const [score, setScore] = useState(null); 
+    const [results, setResults] = useState(null); 
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         const fetchQuiz = async () => {
@@ -64,6 +66,7 @@ const QuizPage = () => {
             setError("Please enter your name before submitting the quiz.");
             return;
         }
+        setLoading(true);
         
         try {
             const response = await fetch(`/api/quiz/${quizId}`, {
@@ -71,13 +74,13 @@ const QuizPage = () => {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                // Updated to send studentName instead of name
                 body: JSON.stringify({ studentName, selectedAnswers }),
             });
 
             const result = await response.json();
             if (response.ok) {
-                setScore(result.score); // Display the score to the student
+                setScore(result.score);
+                setResults(result.results); // Display results with correctness
             } else {
                 setError(result.error || "Failed to submit quiz.");
             }
@@ -102,7 +105,6 @@ const QuizPage = () => {
                 <h2 className="text-xl text-center text-gray-700 mb-6">Subject: {quizData.subject}</h2>
                 <h2 className="text-center text-gray-700 mb-6">Time Remaining: {formatTime(remainingTime)}</h2>
 
-                {/* Student Name Input */}
                 <div className="mb-4">
                     <label className="block text-gray-700 font-semibold mb-2" htmlFor="studentName">
                         Enter your name:
@@ -117,7 +119,6 @@ const QuizPage = () => {
                     />
                 </div>
 
-                {/* Quiz Questions */}
                 {quizData.questions.map((question, index) => (
                     <div key={index} className="mb-6 p-4 bg-white rounded shadow">
                         <h2 className="font-semibold text-lg mb-2">{question.questionText}</h2>
@@ -141,18 +142,44 @@ const QuizPage = () => {
                     </div>
                 ))}
 
-                {/* Display Score or Submit Button */}
                 {score !== null ? (
-                    <p className="text-center text-xl font-semibold mt-4">
-                        Your Score: {score} / {quizData.questions.length * 2} {/* Each question is worth 2 points */}
-                    </p>
+                    <div>
+                        <p className="text-center text-xl font-semibold mt-4">
+                            Your Score: {score} / {quizData.questions.length * 2}
+                        </p>
+                        <div className="mt-6">
+                            {results.map((result, index) => (
+                                <div key={index} className="mb-4">
+                                    <h3 className="font-semibold">{result.questionText}</h3>
+                                    <p>
+                                        Your Answer:{" "}
+                                        <span
+                                            className={
+                                                result.isCorrect
+                                                    ? "text-green-500"
+                                                    : "text-red-500"
+                                            }
+                                        >
+                                            {result.selectedAnswer || "No answer selected"}
+                                        </span>
+                                    </p>
+                                    {!result.isCorrect && (
+                                        <p className="text-gray-700">
+                                            Correct Answer: {result.correctAnswer}
+                                        </p>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                 ) : (
                     <button
-                        className="w-full mt-4 py-2 px-4 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-                        onClick={handleSubmit}
-                    >
-                        Submit Quiz
-                    </button>
+                    className="w-full mt-4 py-2 px-4 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+                    onClick={handleSubmit}
+                    disabled={loading} // Disable button when loading
+                >
+                    {loading ? "Submitting..." : "Submit Quiz"}
+                </button>
                 )}
             </div>
         </div>
