@@ -6,6 +6,7 @@ const QuizPage = () => {
     const router = useRouter();
     const { quizId } = useParams();
     const [quizData, setQuizData] = useState(null);
+    const [remainingTime, setRemainingTime] = useState(null); 
     const [studentName, setStudentName] = useState("");
     const [error, setError] = useState("");
     const [selectedAnswers, setSelectedAnswers] = useState({});
@@ -19,6 +20,7 @@ const QuizPage = () => {
 
                 if (response.ok) {
                     setQuizData(data);
+                    setRemainingTime(data.timeLimit * 60); 
                 } else {
                     setError(data.error || "Failed to load quiz data.");
                 }
@@ -30,6 +32,23 @@ const QuizPage = () => {
 
         fetchQuiz();
     }, [quizId]);
+
+    useEffect(() => {
+        if (remainingTime > 0) {
+          const timer = setInterval(() => {
+            setRemainingTime((prevTime) => prevTime - 1);
+          }, 1000);
+          return () => clearInterval(timer);
+        } else if (remainingTime === 0) {
+          handleSubmit(); // Auto-submit when time is up
+        }
+      }, [remainingTime]);
+
+      const formatTime = (seconds) => {
+        const minutes = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${minutes}:${secs < 10 ? "0" : ""}${secs}`;
+      };
 
     // Track answer selection
     const handleOptionChange = (questionIndex, option) => {
@@ -81,6 +100,7 @@ const QuizPage = () => {
             <div className="max-w-lg mx-auto">
                 <h1 className="text-3xl font-bold text-center mb-4">{quizData.title}</h1>
                 <h2 className="text-xl text-center text-gray-700 mb-6">Subject: {quizData.subject}</h2>
+                <h2 className="text-center text-gray-700 mb-6">Time Remaining: {formatTime(remainingTime)}</h2>
 
                 {/* Student Name Input */}
                 <div className="mb-4">

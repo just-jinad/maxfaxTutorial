@@ -10,6 +10,7 @@ const Page = () => {
   const [subject, setSubject] = useState("");
   const [questions, setQuestions] = useState([]);
   const [generatedPin, setGeneratedPin] = useState("");
+  const [timeLimit, setTimeLimit] = useState(0);
   const [loading, setLoading] = useState(false); // Loading state
 
   useEffect(() => {
@@ -49,7 +50,9 @@ const Page = () => {
       !quizTitle ||
       !subject ||
       questions.length === 0 ||
-      questions.some((q) => !q.questionText || !q.correctAnswer)
+      questions.some((q) => !q.questionText || !q.correctAnswer) ||
+      !timeLimit
+      
     ) {
       toast.error(
         "Please fill in all fields and ensure questions are complete.",
@@ -61,7 +64,7 @@ const Page = () => {
       return;
     }
 
-    const quizData = { title: quizTitle, subject, questions };
+    const quizData = { title: quizTitle, subject, questions, timeLimit };
     setLoading(true); // Set loading to true
     try {
       const response = await fetch("/api/quiz/create", {
@@ -81,6 +84,7 @@ const Page = () => {
         setQuizTitle("");
         setSubject("");
         setQuestions([]);
+        setTimeLimit(0);
       } else {
         console.error("Error:", data.error);
         toast.error(data.error || "Failed to create quiz.", {
@@ -114,6 +118,13 @@ const Page = () => {
         placeholder="Subject"
         value={subject}
         onChange={(e) => setSubject(e.target.value)}
+        className="border p-2 mb-4 w-full rounded-md"
+      />
+        <input
+        type="number"
+        placeholder="Time Limit (in minutes)"
+        value={timeLimit}
+        onChange={(e) => setTimeLimit(e.target.value)}
         className="border p-2 mb-4 w-full rounded-md"
       />
 
