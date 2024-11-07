@@ -10,9 +10,18 @@ export async function POST(request) {
 
     try {
         const quizData = await request.json();
+        console.log(quizData)
+
+        // Validate that timeLimit is provided and is a positive number
+        // if (!quizData.timeLimit || typeof quizData.timeLimit !== "number" || quizData.timeLimit <= 0) {
+        //     return NextResponse.json({ error: "Time limit must be a positive number." }, { status: 400 });
+        // }
+
         const pin = generatePin(); // Generate a unique PIN
-        console.log(pin)
-        const newQuiz = new Quiz({ ...quizData, pin }); // Add PIN to quiz data
+        console.log(pin);
+
+        // Create new quiz with the timeLimit included
+        const newQuiz = new Quiz({ ...quizData, pin, timeLimit: quizData.timeLimit });
 
         await newQuiz.save();
         return NextResponse.json({ message: "Quiz created successfully!", pin });
