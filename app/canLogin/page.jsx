@@ -1,21 +1,23 @@
 "use client";
 import React, { useState } from "react";
-import {useRouter} from 'next/navigation'
+import { useRouter } from 'next/navigation';
 
 const PinEntryPage = () => {
     const [name, setName] = useState("");
     const [pin, setPin] = useState("");
     const [error, setError] = useState("");
-    const router = useRouter()
+    const [loading, setLoading] = useState(false);
+    const router = useRouter();
 
     const handleSubmit = async (e) => {
-
         e.preventDefault();
+
         if (!name || !pin) {
             setError("Please enter both name and pin.");
             return;
         }
         setError("");
+        setLoading(true); // Start loading
 
         try {
             const response = await fetch("/api/quiz/access", {
@@ -27,14 +29,15 @@ const PinEntryPage = () => {
             const data = await response.json();
             if (response.ok) {
                 console.log("Access granted:", data);
-              router.push(`/quiz/${data.quizId}?name=${encodeURIComponent(name)}`);
-                // Redirect to quiz page or display quiz instructions
+                router.push(`/quiz/${data.quizId}?name=${encodeURIComponent(name)}`);
             } else {
                 setError(data.error || "Failed to verify pin.");
             }
         } catch (error) {
             console.error("Error:", error);
             setError("An unexpected error occurred.");
+        } finally {
+            setLoading(false); // Stop loading after processing
         }
     };
 
@@ -72,9 +75,12 @@ const PinEntryPage = () => {
                     )}
                     <button
                         type="submit"
-                        className="w-full px-4 py-2 bg-blue-600 text-white font-semibold rounded-full shadow-lg transition-all duration-200 ease-in-out transform hover:scale-105 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        disabled={loading}
+                        className={`w-full px-4 py-2 text-white font-semibold rounded-full shadow-lg transition-all duration-200 ease-in-out transform focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                            loading ? "bg-gray-400" : "bg-blue-600 hover:scale-105 hover:bg-blue-700"
+                        }`}
                     >
-                        Submit
+                        {loading ? "Loading..." : "Submit"}
                     </button>
                 </form>
             </div>
