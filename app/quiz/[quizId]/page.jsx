@@ -3,18 +3,17 @@ import React, { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import katex from "katex";
 import "katex/dist/katex.min.css";
-import { toast } from "sonner"; // Import sonner for toast notifications
 
 const QuizPage = () => {
     const router = useRouter();
     const { quizId } = useParams();
     const [quizData, setQuizData] = useState(null);
-    const [remainingTime, setRemainingTime] = useState(null);
+    const [remainingTime, setRemainingTime] = useState(null); 
     const [studentName, setStudentName] = useState("");
     const [error, setError] = useState("");
     const [selectedAnswers, setSelectedAnswers] = useState({});
-    const [score, setScore] = useState(null);
-    const [results, setResults] = useState(null);
+    const [score, setScore] = useState(null); 
+    const [results, setResults] = useState(null); 
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -25,15 +24,13 @@ const QuizPage = () => {
 
                 if (response.ok) {
                     setQuizData(data);
-                    setRemainingTime(data.timeLimit * 60);
+                    setRemainingTime(data.timeLimit * 60); 
                 } else {
                     setError(data.error || "Failed to load quiz data.");
-                    toast.error(data.error || "Failed to load quiz data.");
                 }
             } catch (error) {
                 console.error("Error fetching quiz:", error);
                 setError("An unexpected error occurred.");
-                toast.error("An unexpected error occurred.");
             }
         };
 
@@ -66,11 +63,11 @@ const QuizPage = () => {
 
     const handleSubmit = async () => {
         if (!studentName) {
-            toast.error("Please enter your name before submitting the quiz.");
+            setError("Please enter your name before submitting the quiz.");
             return;
         }
         setLoading(true);
-
+        
         try {
             const response = await fetch(`/api/quiz/${quizId}`, {
                 method: "POST",
@@ -86,12 +83,10 @@ const QuizPage = () => {
                 setResults(result.results);
             } else {
                 setError(result.error || "Failed to submit quiz.");
-                toast.error(result.error || "Failed to submit quiz.");
             }
         } catch (error) {
             console.error("Error submitting quiz:", error);
             setError("An unexpected error occurred.");
-            toast.error("An unexpected error occurred.");
         }
     };
 
@@ -105,7 +100,7 @@ const QuizPage = () => {
     };
 
     if (error) {
-        toast.error(error); // Display error via toast
+        return <p className="text-red-500 text-center">{error}</p>;
     }
 
     if (!quizData) {
@@ -173,7 +168,11 @@ const QuizPage = () => {
                                     <p>
                                         Your Answer:{" "}
                                         <span
-                                            className={result.isCorrect ? "text-green-500" : "text-red-500"}
+                                            className={
+                                                result.isCorrect
+                                                    ? "text-green-500"
+                                                    : "text-red-500"
+                                            }
                                             dangerouslySetInnerHTML={{ __html: renderLatex(result.selectedAnswer || "No answer selected") }}
                                         />
                                     </p>
@@ -194,7 +193,7 @@ const QuizPage = () => {
                     <button
                         className="w-full mt-4 py-2 px-4 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
                         onClick={handleSubmit}
-                        disabled={loading || !studentName} // Disable button if name is not entered
+                        disabled={loading}
                     >
                         {loading ? "Submitting..." : "Submit Quiz"}
                     </button>
