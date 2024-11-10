@@ -3,17 +3,18 @@ import React, { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import katex from "katex";
 import "katex/dist/katex.min.css";
+import { toast } from "sonner"; // Import sonner for toast notifications
 
 const QuizPage = () => {
     const router = useRouter();
     const { quizId } = useParams();
     const [quizData, setQuizData] = useState(null);
-    const [remainingTime, setRemainingTime] = useState(null); 
+    const [remainingTime, setRemainingTime] = useState(null);
     const [studentName, setStudentName] = useState("");
     const [error, setError] = useState("");
     const [selectedAnswers, setSelectedAnswers] = useState({});
-    const [score, setScore] = useState(null); 
-    const [results, setResults] = useState(null); 
+    const [score, setScore] = useState(null);
+    const [results, setResults] = useState(null);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -24,13 +25,15 @@ const QuizPage = () => {
 
                 if (response.ok) {
                     setQuizData(data);
-                    setRemainingTime(data.timeLimit * 60); 
+                    setRemainingTime(data.timeLimit * 60);
                 } else {
                     setError(data.error || "Failed to load quiz data.");
+                    toast.error(data.error || "Failed to load quiz data.");
                 }
             } catch (error) {
                 console.error("Error fetching quiz:", error);
                 setError("An unexpected error occurred.");
+                toast.error("An unexpected error occurred.");
             }
         };
 
@@ -63,11 +66,11 @@ const QuizPage = () => {
 
     const handleSubmit = async () => {
         if (!studentName) {
-            setError("Please enter your name before submitting the quiz.");
+            toast.error("Please enter your name before submitting the quiz.");
             return;
         }
         setLoading(true);
-        
+
         try {
             const response = await fetch(`/api/quiz/${quizId}`, {
                 method: "POST",
@@ -83,28 +86,26 @@ const QuizPage = () => {
                 setResults(result.results);
             } else {
                 setError(result.error || "Failed to submit quiz.");
+                toast.error(result.error || "Failed to submit quiz.");
             }
         } catch (error) {
             console.error("Error submitting quiz:", error);
             setError("An unexpected error occurred.");
+            toast.error("An unexpected error occurred.");
         }
     };
 
-    const renderQuestionText = (questionText) => {
+    const renderLatex = (text) => {
         try {
-            return {
-                __html: katex.renderToString(questionText, {
-                    throwOnError: false,
-                }),
-            };
+            return katex.renderToString(text, { throwOnError: false });
         } catch (error) {
             console.error("Error rendering LaTeX:", error);
-            return { __html: questionText }; // Fallback to plain text if rendering fails
+            return text; // Fallback to plain text if LaTeX rendering fails
         }
     };
 
     if (error) {
-        return <p className="text-red-500 text-center">{error}</p>;
+        toast.error(error); // Display error via toast
     }
 
     if (!quizData) {
@@ -136,7 +137,7 @@ const QuizPage = () => {
                     <div key={index} className="mb-6 p-4 bg-white rounded shadow">
                         <h2
                             className="font-semibold text-lg mb-2"
-                            dangerouslySetInnerHTML={renderQuestionText(question.questionText)}
+                            dangerouslySetInnerHTML={{ __html: renderLatex(question.questionText) }}
                         ></h2>
                         <ul>
                             {question.options.map((option, i) => (
@@ -150,7 +151,9 @@ const QuizPage = () => {
                                             onChange={() => handleOptionChange(index, option)}
                                             className="mr-2"
                                         />
-                                        {option}
+                                        <span
+                                            dangerouslySetInnerHTML={{ __html: renderLatex(option) }}
+                                        />
                                     </label>
                                 </li>
                             ))}
@@ -166,22 +169,21 @@ const QuizPage = () => {
                         <div className="mt-6">
                             {results.map((result, index) => (
                                 <div key={index} className="mb-4">
-                                    <h3 className="font-semibold">{result.questionText}</h3>
+                                    <h3 className="font-semibold" dangerouslySetInnerHTML={{ __html: renderLatex(result.questionText) }}></h3>
                                     <p>
                                         Your Answer:{" "}
                                         <span
-                                            className={
-                                                result.isCorrect
-                                                    ? "text-green-500"
-                                                    : "text-red-500"
-                                            }
-                                        >
-                                            {result.selectedAnswer || "No answer selected"}
-                                        </span>
+                                            className={result.isCorrect ? "text-green-500" : "text-red-500"}
+                                            dangerouslySetInnerHTML={{ __html: renderLatex(result.selectedAnswer || "No answer selected") }}
+                                        />
                                     </p>
                                     {!result.isCorrect && (
                                         <p className="text-gray-700">
-                                            Correct Answer: {result.correctAnswer}
+                                            Correct Answer:{" "}
+                                            <span
+                                                className="text-green-500"
+                                                dangerouslySetInnerHTML={{ __html: renderLatex(result.correctAnswer) }}
+                                            />
                                         </p>
                                     )}
                                 </div>
@@ -192,7 +194,7 @@ const QuizPage = () => {
                     <button
                         className="w-full mt-4 py-2 px-4 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
                         onClick={handleSubmit}
-                        disabled={loading}
+                        disabled={loading || !studentName} // Disable button if name is not entered
                     >
                         {loading ? "Submitting..." : "Submit Quiz"}
                     </button>
