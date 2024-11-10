@@ -3,6 +3,12 @@ import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import katex from "katex";
+import "katex/dist/katex.min.css";
+
+const renderLatex = (text) => {
+  return { __html: katex.renderToString(text, { throwOnError: false }) };
+};
 
 const Page = () => {
   const router = useRouter();
@@ -11,7 +17,7 @@ const Page = () => {
   const [questions, setQuestions] = useState([]);
   const [generatedPin, setGeneratedPin] = useState("");
   const [timeLimit, setTimeLimit] = useState(0);
-  const [loading, setLoading] = useState(false); // Loading state
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -45,15 +51,7 @@ const Page = () => {
   };
 
   const handleSubmit = async () => {
-    // Validate input
-    if (
-      !quizTitle ||
-      !subject ||
-      questions.length === 0 ||
-      questions.some((q) => !q.questionText || !q.correctAnswer) ||
-      !timeLimit
-      
-    ) {
+    if (!quizTitle || !subject || questions.length === 0 || !timeLimit) {
       toast.error(
         "Please fill in all fields and ensure questions are complete.",
         {
@@ -65,7 +63,7 @@ const Page = () => {
     }
 
     const quizData = { title: quizTitle, subject, questions, timeLimit };
-    setLoading(true); // Set loading to true
+    setLoading(true);
     try {
       const response = await fetch("/api/quiz/create", {
         method: "POST",
@@ -78,9 +76,8 @@ const Page = () => {
           position: "top-center",
           style: { backgroundColor: "green", color: "white" },
         });
-        setGeneratedPin(data.pin); // Set generated PIN
+        setGeneratedPin(data.pin);
 
-        // Reset the form
         setQuizTitle("");
         setSubject("");
         setQuestions([]);
@@ -99,7 +96,7 @@ const Page = () => {
         style: { backgroundColor: "red", color: "white" },
       });
     } finally {
-      setLoading(false); // Reset loading state
+      setLoading(false);
     }
   };
 
@@ -120,7 +117,7 @@ const Page = () => {
         onChange={(e) => setSubject(e.target.value)}
         className="border p-2 mb-4 w-full rounded-md"
       />
-        <input
+      <input
         type="number"
         placeholder="Time Limit (in minutes)"
         value={timeLimit}
@@ -132,13 +129,18 @@ const Page = () => {
         <div key={qIndex} className="mb-6 p-4 border rounded-md">
           <input
             type="text"
-            placeholder="Question Text"
+            placeholder="Question Text (supports LaTeX)"
             value={question.questionText}
             onChange={(e) =>
               handleQuestionChange(qIndex, "questionText", e.target.value)
             }
             className="border p-2 mb-4 w-full"
           />
+          <p
+            dangerouslySetInnerHTML={renderLatex(question.questionText)}
+            className="katex-preview"
+          ></p>
+          
           <select
             value={question.questionType}
             onChange={(e) =>
@@ -152,16 +154,21 @@ const Page = () => {
 
           {question.questionType === "MCQ" &&
             question.options.map((option, optIndex) => (
-              <input
-                key={optIndex}
-                type="text"
-                placeholder={`Option ${optIndex + 1}`}
-                value={option}
-                onChange={(e) =>
-                  handleOptionChange(qIndex, optIndex, e.target.value)
-                }
-                className="border p-2 mb-2 w-full"
-              />
+              <div key={optIndex}>
+                <input
+                  type="text"
+                  placeholder={`Option ${optIndex + 1} (supports LaTeX)`}
+                  value={option}
+                  onChange={(e) =>
+                    handleOptionChange(qIndex, optIndex, e.target.value)
+                  }
+                  className="border p-2 mb-2 w-full"
+                />
+                <p
+                  dangerouslySetInnerHTML={renderLatex(option)}
+                  className="katex-preview"
+                ></p>
+              </div>
             ))}
           <input
             type="text"
@@ -175,10 +182,6 @@ const Page = () => {
         </div>
       ))}
 
-
-        <div className="grid grid-cols-3 md:grid-cols-3 sm:grid-cols-3 gap-5 "> 
-
-      
       <button
         onClick={addQuestion}
         className="px-4 py-2 bg-blue-500 text-white rounded-md mb-4"
@@ -194,17 +197,14 @@ const Page = () => {
         {loading ? "Creating Quiz..." : "Submit Quiz"}
       </button>
 
-      < Link className="px-4 text-center py-2 bg-yellow-400 text-white rounded-md mb-4" href="/result"> 
-      View scores
+      <Link href="/result">
+        <span className="px-4 text-center py-2 bg-yellow-400 text-white rounded-md mb-4">
+          View scores
+        </span>
       </Link>
-      </div>
 
-      {loading && (
-        <div className="flex items-center justify-center mt-4">
-          <div className="loader"></div>
-        </div>
-      )}
-
+      {loading && <div className="flex items-center justify-center mt-4"><div className="loader"></div></div>}
+      
       {generatedPin && (
         <div className="mt-4 p-4 bg-green-100 border border-green-400 text-green-700">
           Quiz created successfully! PIN for quiz: {generatedPin}

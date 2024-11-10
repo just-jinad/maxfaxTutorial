@@ -1,6 +1,8 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
+import katex from "katex";
+import "katex/dist/katex.min.css";
 
 const QuizPage = () => {
     const router = useRouter();
@@ -37,22 +39,21 @@ const QuizPage = () => {
 
     useEffect(() => {
         if (remainingTime > 0) {
-          const timer = setInterval(() => {
-            setRemainingTime((prevTime) => prevTime - 1);
-          }, 1000);
-          return () => clearInterval(timer);
+            const timer = setInterval(() => {
+                setRemainingTime((prevTime) => prevTime - 1);
+            }, 1000);
+            return () => clearInterval(timer);
         } else if (remainingTime === 0) {
-          handleSubmit(); // Auto-submit when time is up
+            handleSubmit(); // Auto-submit when time is up
         }
-      }, [remainingTime]);
+    }, [remainingTime]);
 
-      const formatTime = (seconds) => {
+    const formatTime = (seconds) => {
         const minutes = Math.floor(seconds / 60);
         const secs = seconds % 60;
         return `${minutes}:${secs < 10 ? "0" : ""}${secs}`;
-      };
+    };
 
-    // Track answer selection
     const handleOptionChange = (questionIndex, option) => {
         setSelectedAnswers((prevAnswers) => ({
             ...prevAnswers,
@@ -60,7 +61,6 @@ const QuizPage = () => {
         }));
     };
 
-    // Submit quiz and calculate score
     const handleSubmit = async () => {
         if (!studentName) {
             setError("Please enter your name before submitting the quiz.");
@@ -80,13 +80,26 @@ const QuizPage = () => {
             const result = await response.json();
             if (response.ok) {
                 setScore(result.score);
-                setResults(result.results); // Display results with correctness
+                setResults(result.results);
             } else {
                 setError(result.error || "Failed to submit quiz.");
             }
         } catch (error) {
             console.error("Error submitting quiz:", error);
             setError("An unexpected error occurred.");
+        }
+    };
+
+    const renderQuestionText = (questionText) => {
+        try {
+            return {
+                __html: katex.renderToString(questionText, {
+                    throwOnError: false,
+                }),
+            };
+        } catch (error) {
+            console.error("Error rendering LaTeX:", error);
+            return { __html: questionText }; // Fallback to plain text if rendering fails
         }
     };
 
@@ -121,7 +134,10 @@ const QuizPage = () => {
 
                 {quizData.questions.map((question, index) => (
                     <div key={index} className="mb-6 p-4 bg-white rounded shadow">
-                        <h2 className="font-semibold text-lg mb-2">{question.questionText}</h2>
+                        <h2
+                            className="font-semibold text-lg mb-2"
+                            dangerouslySetInnerHTML={renderQuestionText(question.questionText)}
+                        ></h2>
                         <ul>
                             {question.options.map((option, i) => (
                                 <li key={i} className="mt-2">
@@ -174,12 +190,12 @@ const QuizPage = () => {
                     </div>
                 ) : (
                     <button
-                    className="w-full mt-4 py-2 px-4 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-                    onClick={handleSubmit}
-                    disabled={loading} // Disable button when loading
-                >
-                    {loading ? "Submitting..." : "Submit Quiz"}
-                </button>
+                        className="w-full mt-4 py-2 px-4 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+                        onClick={handleSubmit}
+                        disabled={loading}
+                    >
+                        {loading ? "Submitting..." : "Submit Quiz"}
+                    </button>
                 )}
             </div>
         </div>
