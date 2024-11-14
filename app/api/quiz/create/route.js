@@ -4,7 +4,7 @@ import { connect } from '@/app/utils/dbConnect';
 import Quiz from '../../../models/quiz';
 
 const generatePin = () => Math.floor(100000 + Math.random() * 900000).toString(); // Generates a 6-digit PIN
-
+                                                                                                       
 export async function POST(request) {
     await connect();
 
@@ -17,7 +17,13 @@ export async function POST(request) {
         console.log(pin);
 
         // Create new quiz with the timeLimit included
-        const newQuiz = new Quiz({ ...quizData, pin, timeLimit: quizData.timeLimit });
+        const newQuiz = new Quiz({ ...quizData,
+             pin, 
+             timeLimit: quizData.timeLimit,
+             attemptLimit: quizData.attemptLimit || 1
+            });
+
+            console.log(newQuiz)
 
         await newQuiz.save();
         return NextResponse.json({ message: "Quiz created successfully!", pin });

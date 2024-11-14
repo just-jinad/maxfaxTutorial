@@ -37,6 +37,8 @@ export async function GET(request, { params }) {
 }
 
 // POST request to submit answers and calculate score
+
+
 export async function POST(request, { params }) {
   // Connect to the database
   await connect();
@@ -45,10 +47,21 @@ export async function POST(request, { params }) {
     const { quizId } = params;
     const { studentName, selectedAnswers } = await request.json();
 
-    // Fetch the quiz to get correct answers
+    // Fetch the quiz to get correct answers and allowed attempts
     const quiz = await Quiz.findById(quizId);
     if (!quiz) {
       return NextResponse.json({ error: "Quiz not found." }, { status: 404 });
+    }
+
+    // Check for existing submissions by this student for this quiz
+    const studentSubmissions = await Submission.find({ quizId, studentName });
+    const maxAttempts = quiz.maxAttempts || 1; // Assume a default of 1 if not specified
+
+    if (studentSubmissions.length >= maxAttempts) {
+      return NextResponse.json(
+        { error: "You have reached the maximum number of attempts for this quiz." },
+        { status: 403 }
+      );
     }
 
     // Calculate score and determine correctness per question
@@ -64,21 +77,23 @@ export async function POST(request, { params }) {
       };
     });
 
-    // Create and save the new submission to MongoDB
+    // Save the new submission to MongoDB
     const newSubmission = await Submission.create({
       studentName,
       score,
       quizId,
+      attemptNumber: studentSubmissions.length + 1, // Track attempt number
     });
     console.log("New submission saved:", newSubmission);
 
-    // Return the calculated score, results, and detailed feedback
+    // Return the calculated score, results, and attempt status
     return NextResponse.json({
       message: "Quiz submitted successfully.",
       studentName,
       score,
       totalScore: quiz.questions.length * 2,
       results,
+      remainingAttempts: maxAttempts - (studentSubmissions.length + 1), // Remaining attempts
     });
   } catch (error) {
     console.error("Error submitting quiz:", error);
@@ -88,3 +103,4 @@ export async function POST(request, { params }) {
     );
   }
 }
+

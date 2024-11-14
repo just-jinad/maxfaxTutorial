@@ -15,8 +15,9 @@ const Page = () => {
   const [quizTitle, setQuizTitle] = useState("");
   const [subject, setSubject] = useState("");
   const [questions, setQuestions] = useState([]);
-  const [generatedPin, setGeneratedPin] = useState("");
+  const [attemptLimit, setAttemptLimit] = useState(0);
   const [timeLimit, setTimeLimit] = useState(0);
+  const [generatedPin, setGeneratedPin] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -34,10 +35,12 @@ const Page = () => {
         questionType: "MCQ",
         options: ["", "", "", ""],
         correctAnswer: "",
+        imageUrl: "",
       },
     ]);
   };
 
+  
   const handleQuestionChange = (index, field, value) => {
     const updatedQuestions = [...questions];
     updatedQuestions[index][field] = value;
@@ -50,19 +53,56 @@ const Page = () => {
     setQuestions(updatedQuestions);
   };
 
+  // Define handleImageUpload outside handleSubmit
+  const handleImageUpload = async (qIndex, file) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    console.log("Uploading file:", file);
+
+  
+    try {
+      const response = await fetch("/api/uploadImage", {
+        method: "POST",
+        body: formData,
+      });
+  
+      const data = await response.json();
+      console.log(data) // shows the image url 
+
+      if (response.ok) {
+        const updatedQuestions = [...questions];
+        updatedQuestions[qIndex].imageUrl = data.imageUrl;
+        setQuestions(updatedQuestions);
+        console.log("Updated questions with image URL:", updatedQuestions);
+      } else {
+        toast.error("Failed to upload image.");
+      }
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      toast.error("Image upload error.");
+    }
+  };
+  
+
   const handleSubmit = async () => {
     if (!quizTitle || !subject || questions.length === 0 || !timeLimit) {
-      toast.error(
-        "Please fill in all fields and ensure questions are complete.",
-        {
-          position: "top-center",
-          style: { backgroundColor: "red", color: "white" },
-        }
-      );
+      toast.error("Please fill in all fields and ensure questions are complete.", {
+        position: "top-center",
+        style: { backgroundColor: "red", color: "white" },
+      });
       return;
     }
 
-    const quizData = { title: quizTitle, subject, questions, timeLimit };
+    const quizData = {
+      title: quizTitle,
+      subject,
+      questions,
+      timeLimit,
+      attemptLimit,
+    };
+
+    console.log(quizData)
+
     setLoading(true);
     try {
       const response = await fetch("/api/quiz/create", {
@@ -71,6 +111,9 @@ const Page = () => {
         body: JSON.stringify(quizData),
       });
       const data = await response.json();
+      console.log(data)
+      console.log("Questions before submission:", questions);
+
       if (response.ok) {
         toast.success("Quiz created successfully!", {
           position: "top-center",
@@ -78,19 +121,19 @@ const Page = () => {
         });
         setGeneratedPin(data.pin);
 
+        // Reset form
         setQuizTitle("");
         setSubject("");
         setQuestions([]);
         setTimeLimit(0);
+        setAttemptLimit(0);
       } else {
-        console.error("Error:", data.error);
         toast.error(data.error || "Failed to create quiz.", {
           position: "top-center",
           style: { backgroundColor: "red", color: "white" },
         });
       }
     } catch (error) {
-      console.error("Failed to create quiz:", error);
       toast.error("Failed to create quiz due to a server error.", {
         position: "top-center",
         style: { backgroundColor: "red", color: "white" },
@@ -124,6 +167,13 @@ const Page = () => {
         onChange={(e) => setTimeLimit(e.target.value)}
         className="border p-2 mb-4 w-full rounded-md"
       />
+      <input
+        type="number"
+        placeholder="Attempt Limit (e.g., 3)"
+        value={attemptLimit}
+        onChange={(e) => setAttemptLimit(e.target.value)}
+        className="border p-2 mb-4 w-full rounded-md"
+      />
 
       {questions.map((question, qIndex) => (
         <div key={qIndex} className="mb-6 p-4 border rounded-md">
@@ -140,7 +190,7 @@ const Page = () => {
             dangerouslySetInnerHTML={renderLatex(question.questionText)}
             className="katex-preview"
           ></p>
-          
+
           <select
             value={question.questionType}
             onChange={(e) =>
@@ -151,6 +201,16 @@ const Page = () => {
             <option value="MCQ">Multiple Choice</option>
             <option value="Theory">Theory</option>
           </select>
+
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => handleImageUpload(qIndex, e.target.files[0])}
+            className="mb-2"
+          />
+          {question.imageUrl && (
+            <img src={question.imageUrl} alt="Uploaded" className="w-full h-auto mt-2" />
+          )}
 
           {question.questionType === "MCQ" &&
             question.options.map((option, optIndex) => (
@@ -182,10 +242,7 @@ const Page = () => {
         </div>
       ))}
 
-      <button
-        onClick={addQuestion}
-        className="px-4 py-2 bg-blue-500 text-white rounded-md mb-4"
-      >
+      <button onClick={addQuestion} className="px-4 py-2 bg-blue-500 text-white rounded-md mb-4">
         Add Question
       </button>
 
@@ -203,8 +260,12 @@ const Page = () => {
         </span>
       </Link>
 
-      {loading && <div className="flex items-center justify-center mt-4"><div className="loader"></div></div>}
-      
+      {loading && (
+        <div className="flex items-center justify-center mt-4">
+          <div className="loader"></div>
+        </div>
+      )}
+
       {generatedPin && (
         <div className="mt-4 p-4 bg-green-100 border border-green-400 text-green-700">
           Quiz created successfully! PIN for quiz: {generatedPin}

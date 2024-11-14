@@ -15,6 +15,7 @@ const QuizPage = () => {
     const [score, setScore] = useState(null); 
     const [results, setResults] = useState(null); 
     const [loading, setLoading] = useState(false);
+    const [remainingAttempts, setRemainingAttempts] = useState(null); // NEW
 
     useEffect(() => {
         const fetchQuiz = async () => {
@@ -25,6 +26,7 @@ const QuizPage = () => {
                 if (response.ok) {
                     setQuizData(data);
                     setRemainingTime(data.timeLimit * 60); 
+                    setRemainingAttempts(data.remainingAttempts); // NEW
                 } else {
                     setError(data.error || "Failed to load quiz data.");
                 }
@@ -44,7 +46,7 @@ const QuizPage = () => {
             }, 1000);
             return () => clearInterval(timer);
         } else if (remainingTime === 0) {
-            handleSubmit(); // Auto-submit when time is up
+            handleSubmit();
         }
     }, [remainingTime]);
 
@@ -66,8 +68,13 @@ const QuizPage = () => {
             setError("Please enter your name before submitting the quiz.");
             return;
         }
+        if (remainingAttempts <= 0) { // NEW
+            setError("You have reached the maximum number of attempts for this quiz.");
+            return;
+        }
+
         setLoading(true);
-        
+
         try {
             const response = await fetch(`/api/quiz/${quizId}`, {
                 method: "POST",
@@ -81,12 +88,15 @@ const QuizPage = () => {
             if (response.ok) {
                 setScore(result.score);
                 setResults(result.results);
+                setRemainingAttempts(result.remainingAttempts); // Update remaining attempts after submission
             } else {
                 setError(result.error || "Failed to submit quiz.");
             }
         } catch (error) {
             console.error("Error submitting quiz:", error);
             setError("An unexpected error occurred.");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -95,7 +105,7 @@ const QuizPage = () => {
             return katex.renderToString(text, { throwOnError: false });
         } catch (error) {
             console.error("Error rendering LaTeX:", error);
-            return text; // Fallback to plain text if LaTeX rendering fails
+            return text;
         }
     };
 
@@ -113,6 +123,10 @@ const QuizPage = () => {
                 <h1 className="text-3xl font-bold text-center mb-4">{quizData.title}</h1>
                 <h2 className="text-xl text-center text-gray-700 mb-6">Subject: {quizData.subject}</h2>
                 <h2 className="text-center text-gray-700 mb-6">Time Remaining: {formatTime(remainingTime)}</h2>
+
+                <div className="text-center mb-4">
+                    <p className="text-gray-700 font-semibold">Remaining Attempts: {remainingAttempts}</p> {/* NEW */}
+                </div>
 
                 <div className="mb-4">
                     <label className="block text-gray-700 font-semibold mb-2" htmlFor="studentName">
@@ -193,7 +207,7 @@ const QuizPage = () => {
                     <button
                         className="w-full mt-4 py-2 px-4 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
                         onClick={handleSubmit}
-                        disabled={loading}
+                        disabled={loading || remainingAttempts <= 0} // Disable if no attempts left
                     >
                         {loading ? "Submitting..." : "Submit Quiz"}
                     </button>
