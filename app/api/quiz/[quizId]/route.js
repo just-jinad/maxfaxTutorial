@@ -25,6 +25,7 @@ export async function GET(request, { params }) {
         questionText: question.questionText,
         options: question.options,
         questionType: question.questionType,
+        imageUrl: question.imageUrl,
       })),
     });
   } catch (error) {
