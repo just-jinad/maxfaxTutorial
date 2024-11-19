@@ -67,11 +67,11 @@ const Page = () => {
       });
   
       const data = await response.json();
-      console.log(data) // shows the image url 
+      console.log(data.url) // shows the image url 
 
       if (response.ok) {
         const updatedQuestions = [...questions];
-        updatedQuestions[qIndex].imageUrl = data.imageUrl;
+        updatedQuestions[qIndex].imageUrl = data.url;
         setQuestions(updatedQuestions);
         console.log("Updated questions with image URL:", updatedQuestions);
       } else {
