@@ -51,7 +51,7 @@ const QuizList = () => {
         toast.success("Delete successful", {
           position: "top-center",
           style: { backgroundColor: "green", color: "white" },
-        });;
+        });
         fetchQuizzes(); // Refresh the list
       } else {
         toast.error('Failed to delete quiz', {
