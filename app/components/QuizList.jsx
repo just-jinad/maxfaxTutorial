@@ -13,12 +13,12 @@ const QuizList = () => {
     }
   }, [router]);
 
-  const fetchQuizzes = useCallback(async () => {
+  const fetchQuizzes = async () => {
     console.log('Fetching quizzes...');
     try {
       const res = await fetch('/api/quiz/all', {
         headers: {
-          'Cache-Control': 'no-cache',
+          'Cache-Control': 'no-store, max-age=0',
         },
       });
       if (!res.ok) throw new Error('Server responded with an error');
@@ -34,10 +34,10 @@ const QuizList = () => {
       console.error('Error fetching quizzes:', error);
       toast.error('Error fetching quizzes: ' + error.message, {
         position: "top-center",
-        style: { backgroundColor: "red", color: "white" }
+        style: { backgroundColor: "red", color: "white" },
       });
     }
-  }, []);
+  };
 
   useEffect(() => {
     fetchQuizzes();
