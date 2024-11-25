@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 
@@ -11,56 +11,65 @@ const QuizList = () => {
     if(!token){
       router.push("/login");
     }
-  }, [router])
-  
+  }, [router]);
 
-  // Fetch quizzes from backend
-  const fetchQuizzes = async () => {
+  const fetchQuizzes = useCallback(async () => {
+    console.log('Fetching quizzes...');
     try {
-      const res = await fetch('/api/quiz/all');
+      const res = await fetch('/api/quiz/all', {
+        headers: {
+          'Cache-Control': 'no-cache',
+        },
+      });
+      if (!res.ok) throw new Error('Server responded with an error');
       const data = await res.json();
 
+      console.log('Fetched quizzes:', data);
       if (data.quizzes) {
         setQuizzes(data.quizzes);
       } else {
-        toast.error('Failed to load quizzes', {
-          position: "top-center"
-        });
+        throw new Error('Unexpected response from server');
       }
     } catch (error) {
-      toast.error('Error fetching quizzes',{
-        position:"top-center",
-        style:{backgroundColor:"red", color:"white"}
+      console.error('Error fetching quizzes:', error);
+      toast.error('Error fetching quizzes: ' + error.message, {
+        position: "top-center",
+        style: { backgroundColor: "red", color: "white" }
       });
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchQuizzes();
-  }, []);
+  }, [fetchQuizzes]);
 
   const deleteQuiz = async (id) => {
-      console.log(id)
+    console.log('Attempting to delete quiz:', id);
     try {
       const res = await fetch(`/api/quiz/delete/${id}`, {
         method: 'DELETE',
+        headers: {
+          'Cache-Control': 'no-cache',
+        },
       });
+      if (!res.ok) throw new Error('Server responded with an error');
       const data = await res.json();
       
+      console.log('Delete response:', data);
       if (data.message) {
         toast.success("Delete successful", {
           position: "top-center",
           style: { backgroundColor: "green", color: "white" },
         });
-        console.log("quiz has been deleted")
-        fetchQuizzes(); // Refresh the list
+        console.log("Quiz has been deleted");
+        setQuizzes(prevQuizzes => prevQuizzes.filter(quiz => quiz._id !== id));
+        await fetchQuizzes(); // Refresh the list to ensure consistency
       } else {
-        toast.error('Failed to delete quiz', {
-          position: "top-center",
-        });
+        throw new Error('Unexpected response from server');
       }
     } catch (error) {
-      toast.error('Error deleting quiz', {
+      console.error('Error deleting quiz:', error);
+      toast.error('Error deleting quiz: ' + error.message, {
         position: "top-center"
       });
     }
@@ -70,22 +79,26 @@ const QuizList = () => {
     try {
       const res = await fetch('/api/quiz/deleteAll', {
         method: 'DELETE',
+        headers: {
+          'Cache-Control': 'no-cache',
+        },
       });
+      if (!res.ok) throw new Error('Server responded with an error');
       const data = await res.json();
       if (data.message) {
-        toast.success('All quizzes deleted successfully!',{
-          position:"top-center",
-          style:{ backgroundColor: "green", color: "white" },
+        toast.success('All quizzes deleted successfully!', {
+          position: "top-center",
+          style: { backgroundColor: "green", color: "white" },
         });
         setQuizzes([]); // Clear the list of quizzes
+        await fetchQuizzes(); // Refresh the list to ensure consistency
       } else {
-        toast.error('Failed to delete all quizzes',{
-          position:"top-center"
-        });
+        throw new Error('Unexpected response from server');
       }
     } catch (error) {
-      toast.error('Error deleting all quizzes', {
-        position:"top-center"
+      console.error('Error deleting all quizzes:', error);
+      toast.error('Error deleting all quizzes: ' + error.message, {
+        position: "top-center"
       });
     }
   };
@@ -136,3 +149,4 @@ const QuizList = () => {
 };
 
 export default QuizList;
+
