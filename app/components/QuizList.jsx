@@ -52,6 +52,7 @@ const QuizList = () => {
           position: "top-center",
           style: { backgroundColor: "green", color: "white" },
         });
+        console.log("quiz has been deleted")
         fetchQuizzes(); // Refresh the list
       } else {
         toast.error('Failed to delete quiz', {

@@ -107,7 +107,10 @@ const Page = () => {
         setTimeLimit(0);
         setAttemptLimit(0);
       } else {
-        toast.error(data.error || "Failed to create quiz.");
+        toast.error(data.error || "Failed to create quiz.", {
+          position:"top-center",
+          style: {backgroundColor:"green", color:"white"}
+        });
       }
     } catch (error) {
       toast.error("Error creating quiz.");
