@@ -41,7 +41,7 @@ const QuizList = () => {
 
   useEffect(() => {
     fetchQuizzes();
-  }, [fetchQuizzes]);
+  }, []);
 
   const deleteQuiz = async (id) => {
     console.log('Attempting to delete quiz:', id);
