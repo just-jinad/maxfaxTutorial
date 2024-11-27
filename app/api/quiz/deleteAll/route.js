@@ -5,31 +5,13 @@ import Quiz from '../../../models/quiz';
 
 export async function DELETE() {
     await connect();
-
+  
     try {
-        const result = await Quiz.deleteMany();
-        console.log('All quizzes deleted:', result);
-
-        return NextResponse.json(
-            { message: "All quizzes deleted successfully!" },
-            {
-                status: 200,
-                headers: {
-                    'Cache-Control': 'no-store, max-age=0',
-                },
-            }
-        );
+      await Quiz.deleteMany({});
+      return NextResponse.json({ message: "All quizzes deleted successfully." });
     } catch (error) {
-        console.error("Error deleting all quizzes:", error);
-        return NextResponse.json(
-            { error: "Failed to delete all quizzes." },
-            { 
-                status: 500,
-                headers: {
-                    'Cache-Control': 'no-store, max-age=0',
-                },
-            }
-        );
+      console.error("Error deleting all quizzes:", error);
+      return NextResponse.json({ error: "Failed to delete all quizzes." }, { status: 400 });
     }
-}
-
+  }
+  
