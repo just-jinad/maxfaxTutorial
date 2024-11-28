@@ -21,7 +21,11 @@ export default function AdminDashboard() {
 
   const fetchQuizzes = async () => {
     try {
-      const response = await fetch('/api/quiz/getAll');
+      const response = await fetch('/api/quiz/getAll', {
+        headers: {
+          'Cache-Control': 'no-store', // Prevent caching by browser
+        }
+      });
       if (response.ok) {
         const data = await response.json();
         setQuizzes(data);
