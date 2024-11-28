@@ -7,6 +7,7 @@ import Question from "../components/dashboard/Question";
 import QuizSubmitButton from "../components/dashboard/QuizSubmitButton";
 import katex from "katex";
 import "katex/dist/katex.min.css";
+import Link from "next/link";
 
 const renderLatex = (text) => {
   return { __html: katex.renderToString(text, { throwOnError: false }) };
@@ -120,7 +121,7 @@ const Page = () => {
   };
 
   return (
-    <div className="p-4">
+    <div className="p-4 g">
       <div>Welcome to the dashboard</div>
       <QuizForm
         quizTitle={quizTitle}
@@ -142,6 +143,10 @@ const Page = () => {
           handleImageUpload={handleImageUpload}
         />
       ))}
+
+      <div className="grid grid-cols-2 md:grid-cols-2 sm:grid-cols-2 gap-3">
+        
+      
       <button
         onClick={addQuestion}
         className="px-4 py-2 bg-blue-500 text-white rounded-md mb-4"
@@ -154,6 +159,17 @@ const Page = () => {
           <p>Your quiz PIN: {generatedPin}</p>
         </div>
       )}
+      <button className="px-4 py-2 bg-yellow-500 text-white rounded-md mb-4">
+      <Link href="/result">
+        view student score
+      </Link>
+      </button>
+      <button className="px-4 py-2 bg-red-400 text-white rounded-md mb-4">
+        <Link href="/admin">
+        Edit/Delete
+        </Link>
+      </button>
+      </div>
     </div>
   );
 };
