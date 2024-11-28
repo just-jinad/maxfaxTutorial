@@ -3,9 +3,7 @@ import { NextResponse } from "next/server";
 import { connect } from '@/app/utils/dbConnect';
 import Quiz from '@/app/models/quiz';
 
-import { NextResponse } from "next/server";
-import { connect } from '@/app/utils/dbConnect';
-import Quiz from '@/app/models/quiz';
+
 
 export async function DELETE(request, { params }) {
   await connect();
