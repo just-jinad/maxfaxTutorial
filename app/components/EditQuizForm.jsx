@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation"; // Ensure it's the 'next/router' module
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 const EditQuizForm = ({ id }) => {
@@ -134,59 +134,77 @@ const EditQuizForm = ({ id }) => {
             </div>
           </div>
 
-        </form>
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Edit Questions</h3>
+            {quizData.questions.map((question, index) => (
+              <div key={index} className="border p-4 rounded-md space-y-2">
+                <div className="flex flex-col">
+                  <label className="text-gray-700 font-medium mb-1">Question:</label>
+                  <input
+                    type="text"
+                    name={`questionText-${index}`}
+                    value={question.questionText || ""}
+                    onChange={(e) => {
+                      const updatedQuestions = [...quizData.questions];
+                      updatedQuestions[index].questionText = e.target.value;
+                      setQuizData({ ...quizData, questions: updatedQuestions });
+                    }}
+                    required
+                    className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
 
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Edit Questions</h3>
-        {quizData.questions.map((question, index) => (
-  <div key={index} className="border p-4 rounded-md space-y-2">
-    <div className="flex flex-col">
-      <label className="text-gray-700 font-medium mb-1">Question:</label>
-      <input
-        type="text"
-        name={`questionText-${index}`}
-        value={question.questionText || ""}  
-        onChange={(e) => {
-          const updatedQuestions = [...quizData.questions];
-          updatedQuestions[index].questionText = e.target.value;
-          setQuizData({ ...quizData, questions: updatedQuestions });
-        }}
-        required
-        className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-      />
-    </div>
-    <div className="flex flex-col">
-      <label className="text-gray-700 font-medium mb-1">Options:</label>
-      <textarea
-        name={`options-${index}`}
-        value={question.options ? question.options.join("\n") : ""} 
-        onChange={(e) => {
-          const updatedQuestions = [...quizData.questions];
-          updatedQuestions[index].options = e.target.value.split("\n");
-          setQuizData({ ...quizData, questions: updatedQuestions });
-        }}
-        required
-        className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-      ></textarea>
-    </div>
-    <div className="flex flex-col">
-      <label className="text-gray-700 font-medium mb-1">Correct Answer:</label>
-      <input
-        type="text"
-        name={`correctAnswer-${index}`}
-        value={question.correctAnswer || ""}  
-        onChange={(e) => {
-          const updatedQuestions = [...quizData.questions];
-          updatedQuestions[index].correctAnswer = e.target.value;
-          setQuizData({ ...quizData, questions: updatedQuestions });
-        }}
-        required
-        className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-      />
-    </div>
-  </div>
-))}
-      </div>
+                {/* LaTeX Equation Input */}
+                <div className="flex flex-col">
+                  <label className="text-gray-700 font-medium mb-1">LaTeX Equation:</label>
+                  <input
+                    type="text"
+                    name={`latexEquation-${index}`}
+                    value={question.latexEquation || ""}
+                    onChange={(e) => {
+                      const updatedQuestions = [...quizData.questions];
+                      updatedQuestions[index].latexEquation = e.target.value;
+                      setQuizData({ ...quizData, questions: updatedQuestions });
+                    }}
+                    required
+                    className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div className="flex flex-col">
+                  <label className="text-gray-700 font-medium mb-1">Options:</label>
+                  <textarea
+                    name={`options-${index}`}
+                    value={question.options ? question.options.join("\n") : ""}
+                    onChange={(e) => {
+                      const updatedQuestions = [...quizData.questions];
+                      updatedQuestions[index].options = e.target.value.split("\n");
+                      setQuizData({ ...quizData, questions: updatedQuestions });
+                    }}
+                    required
+                    className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  ></textarea>
+                </div>
+
+                <div className="flex flex-col">
+                  <label className="text-gray-700 font-medium mb-1">Correct Answer:</label>
+                  <input
+                    type="text"
+                    name={`correctAnswer-${index}`}
+                    value={question.correctAnswer || ""}
+                    onChange={(e) => {
+                      const updatedQuestions = [...quizData.questions];
+                      updatedQuestions[index].correctAnswer = e.target.value;
+                      setQuizData({ ...quizData, questions: updatedQuestions });
+                    }}
+                    required
+                    className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+
           <div className="flex justify-center">
             <button
               type="submit"
@@ -195,6 +213,7 @@ const EditQuizForm = ({ id }) => {
               Update Quiz
             </button>
           </div>
+        </form>
       </div>
     </>
   );

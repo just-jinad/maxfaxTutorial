@@ -35,6 +35,7 @@ const Page = () => {
       ...questions,
       {
         questionText: "",
+        latexEquation:"",
         questionType: "MCQ",
         options: ["", "", "", ""],
         correctAnswer: "",

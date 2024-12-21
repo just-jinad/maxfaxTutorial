@@ -160,10 +160,11 @@ const QuizPage = () => {
 
         {quizData.questions.map((question, index) => (
           <div key={index} className="mb-6 p-4 bg-white rounded shadow">
+            <span>{question.questionText}</span>
             <h2
               className="font-semibold text-lg mb-2"
               dangerouslySetInnerHTML={{
-                __html: renderLatex(question.questionText),
+                __html: renderLatex(question.latexEquation),
               }}
             ></h2>
 

@@ -2,7 +2,8 @@
 import mongoose from 'mongoose';
 
 const questionSchema = new mongoose.Schema({
-    questionText: String,
+    questionText: String, // Plain text
+    latexEquation: String, // LaTeX equation
     options: [String],
     correctAnswer: String,
     imageUrl: String ,
