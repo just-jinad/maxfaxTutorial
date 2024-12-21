@@ -96,6 +96,12 @@ export default function EditQuizModal({ quiz, onClose, onUpdate }) {
                     onChange={(e) => handleQuestionChange(qIndex, 'questionText', e.target.value)}
                     className="w-full px-3 py-2 border rounded"
                   />
+                  <label className="block mb-1">Latex Text</label>
+                     <textarea
+                    value={question.latexEquation}
+                    onChange={(e) => handleQuestionChange(qIndex, 'latexEquation', e.target.value)}
+                    className="w-full px-3 py-2 border rounded"
+                  />
                 </div>
                 <div className="mb-2">
                   <label className="block mb-1">Question Type</label>

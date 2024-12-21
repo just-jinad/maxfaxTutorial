@@ -23,6 +23,7 @@ export async function GET(request, { params }) {
       timeLimit: quiz.timeLimit,
       questions: quiz.questions.map((question) => ({
         questionText: question.questionText,
+        latexEquation: question.latexEquation,
         options: question.options,
         questionType: question.questionType,
         imageUrl: question.imageUrl,
@@ -72,6 +73,7 @@ export async function POST(request, { params }) {
       if (isCorrect) score += 2; // 2 points per correct answer
       return {
         questionText: question.questionText,
+        latexEquation: question.latexEquation,
         correctAnswer: question.correctAnswer,
         selectedAnswer: selectedAnswers[index],
         isCorrect,
