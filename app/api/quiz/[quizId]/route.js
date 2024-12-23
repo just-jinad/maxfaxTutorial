@@ -21,6 +21,7 @@ export async function GET(request, { params }) {
       title: quiz.title,
       subject: quiz.subject,
       timeLimit: quiz.timeLimit,
+      showScoresImmediately:quiz.showScoresImmediately,
       questions: quiz.questions.map((question) => ({
         questionText: question.questionText,
         latexEquation: question.latexEquation,

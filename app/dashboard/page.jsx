@@ -22,6 +22,7 @@ const Page = () => {
   const [timeLimit, setTimeLimit] = useState(0);
   const [loading, setLoading] = useState(false);
   const [generatedPin, setGeneratedPin] = useState("");
+  const [showScoresImmediately, setShowScoresImmediately] = useState(false); // New state for controlling score visibility
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -35,7 +36,7 @@ const Page = () => {
       ...questions,
       {
         questionText: "",
-        latexEquation:"",
+        latexEquation: "",
         questionType: "MCQ",
         options: ["", "", "", ""],
         correctAnswer: "",
@@ -90,6 +91,7 @@ const Page = () => {
       questions,
       timeLimit,
       attemptLimit,
+      showScoresImmediately, // Include the showScoresImmediately field
     };
 
     setLoading(true);
@@ -108,10 +110,11 @@ const Page = () => {
         setQuestions([]);
         setTimeLimit(0);
         setAttemptLimit(0);
+        setShowScoresImmediately(false); // Reset the toggle after submission
       } else {
         toast.error(data.error || "Failed to create quiz.", {
-          position:"top-center",
-          style: {backgroundColor:"green", color:"white"}
+          position: "top-center",
+          style: { backgroundColor: "green", color: "white" },
         });
       }
     } catch (error) {
@@ -144,32 +147,39 @@ const Page = () => {
           handleImageUpload={handleImageUpload}
         />
       ))}
+      
+      {/* Add the toggle for showScoresImmediately */}
+      <div className="mt-4">
+        <label className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            checked={showScoresImmediately}
+            onChange={() => setShowScoresImmediately(!showScoresImmediately)}
+            className="form-checkbox"
+          />
+          <span>Allow students to see their Answers immediately after submitting</span>
+        </label>
+      </div>
 
       <div className="grid grid-cols-2 md:grid-cols-2 sm:grid-cols-2 gap-3">
-        
-      
-      <button
-        onClick={addQuestion}
-        className="px-4 py-2 bg-blue-500 text-white rounded-md mb-4"
-      >
-        Add Question
-      </button>
-      <QuizSubmitButton handleSubmit={handleSubmit} loading={loading} />
-      {generatedPin && (
-        <div className="mt-4 p-2 bg-green-100 rounded-md">
-          <p>Your quiz PIN: {generatedPin}</p>
-        </div>
-      )}
-      <button className="px-4 py-2 bg-yellow-500 text-white rounded-md mb-4">
-      <Link href="/result">
-        view student score
-      </Link>
-      </button>
-      <button className="px-4 py-2 bg-red-400 text-white rounded-md mb-4">
-        <Link href="/admin">
-        Edit/Delete
-        </Link>
-      </button>
+        <button
+          onClick={addQuestion}
+          className="px-4 py-2 bg-blue-500 text-white rounded-md mb-4"
+        >
+          Add Question
+        </button>
+        <QuizSubmitButton handleSubmit={handleSubmit} loading={loading} />
+        {generatedPin && (
+          <div className="mt-4 p-2 bg-green-100 rounded-md">
+            <p>Your quiz PIN: {generatedPin}</p>
+          </div>
+        )}
+        <button className="px-4 py-2 bg-yellow-500 text-white rounded-md mb-4">
+          <Link href="/result">View Student Score</Link>
+        </button>
+        <button className="px-4 py-2 bg-red-400 text-white rounded-md mb-4">
+          <Link href="/admin">Edit/Delete</Link>
+        </button>
       </div>
     </div>
   );

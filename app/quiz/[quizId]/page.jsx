@@ -17,18 +17,20 @@ const QuizPage = () => {
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);
   const [remainingAttempts, setRemainingAttempts] = useState(null);
+  const [showScoresImmediately, setShowScoresImmediately] = useState(false);
+  const [showAnswers, setShowAnswers] = useState(false);
 
   useEffect(() => {
     const fetchQuiz = async () => {
       try {
         const response = await fetch(`/api/quiz/${quizId}`);
         const data = await response.json();
-        console.log(data)
 
         if (response.ok) {
           setQuizData(data);
           setRemainingTime(data.timeLimit * 60);
           setRemainingAttempts(data.remainingAttempts);
+          setShowScoresImmediately(data.showScoresImmediately);
         } else {
           setError(data.error || "Failed to load quiz data.");
         }
@@ -89,11 +91,13 @@ const QuizPage = () => {
       });
 
       const result = await response.json();
-      console.log(result)
       if (response.ok) {
         setScore(result.score);
         setResults(result.results);
         setRemainingAttempts(result.remainingAttempts);
+
+        // Show answers only if the toggle is enabled
+        setShowAnswers(showScoresImmediately);
       } else {
         setError(result.error || "Failed to submit quiz.");
       }
@@ -206,48 +210,54 @@ const QuizPage = () => {
             <p className="text-center text-xl font-semibold mt-4">
               Your Score: {score} / {quizData.questions.length * 2}
             </p>
-            <div className="mt-6">
-              {results.map((result, index) => (
-                <div key={index} className="mb-4">
-                  <h3
-                    className="font-semibold"
-                    dangerouslySetInnerHTML={{
-                      __html: renderLatex(result.questionText),
-                    }}
-                  ></h3>
-                  <p>
-                    Your Answer:{" "}
-                    <span
-                      className={
-                        result.isCorrect ? "text-green-500" : "text-red-500"
-                      }
+
+            {/* Show/Hide Answers Toggle */}
+            {showAnswers && (
+              <div className="mt-6">
+                {results.map((result, index) => (
+                  <div key={index} className="mb-4">
+                    <h3
+                      className="font-semibold"
                       dangerouslySetInnerHTML={{
-                        __html: renderLatex(
-                          result.selectedAnswer || "No answer selected"
-                        ),
+                        __html: renderLatex(result.questionText),
                       }}
-                    />
-                  </p>
-                  {!result.isCorrect && (
-                    <p className="text-gray-700">
-                      Correct Answer:{" "}
+                    ></h3>
+                    <p>
+                      Your Answer:{" "}
                       <span
-                        className="text-green-500"
+                        className={
+                          result.isCorrect
+                            ? "text-green-500"
+                            : "text-red-500"
+                        }
                         dangerouslySetInnerHTML={{
-                          __html: renderLatex(result.correctAnswer),
+                          __html: renderLatex(
+                            result.selectedAnswer || "No answer selected"
+                          ),
                         }}
                       />
                     </p>
-                  )}
-                </div>
-              ))}
-            </div>
+                    {!result.isCorrect && (
+                      <p className="text-gray-700">
+                        Correct Answer:{" "}
+                        <span
+                          className="text-green-500"
+                          dangerouslySetInnerHTML={{
+                            __html: renderLatex(result.correctAnswer),
+                          }}
+                        />
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         ) : (
           <button
             className="w-full mt-4 py-2 px-4 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
             onClick={handleSubmit}
-            disabled={loading || remainingAttempts <= 0}
+            disabled={loading}
           >
             {loading ? "Submitting..." : "Submit Quiz"}
           </button>
