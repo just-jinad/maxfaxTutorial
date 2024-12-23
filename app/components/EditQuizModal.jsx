@@ -35,6 +35,10 @@ export default function EditQuizModal({ quiz, onClose, onUpdate }) {
     setEditedQuiz({ ...editedQuiz, questions: updatedQuestions });
   };
 
+  const handleCheckboxChange = (e) => {
+    setEditedQuiz({ ...editedQuiz, showScoresImmediately: e.target.checked });
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     onUpdate(editedQuiz);
@@ -85,6 +89,18 @@ export default function EditQuizModal({ quiz, onClose, onUpdate }) {
               className="w-full px-3 py-2 border rounded"
             />
           </div>
+          <div>
+          <label className="block mb-1">Show Answers Immediately</label>
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              checked={editedQuiz.showScoresImmediately}
+              onChange={handleCheckboxChange}
+              className="mr-2"
+            />
+            <span>Allow students to view correct and wrong answers immediately after submission</span>
+          </div>
+        </div>
           <div>
             <h4 className="font-bold mb-2">Questions</h4>
             {editedQuiz.questions.map((question, qIndex) => (

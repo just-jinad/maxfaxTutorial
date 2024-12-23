@@ -18,6 +18,7 @@ const quizSchema = new mongoose.Schema({
   
     attemptLimit: Number,
     timeLimit: Number,
+    showScoresImmediately: { type: Boolean, default: false },
     createdAt: { type: Date, default: Date.now },
 });
 
