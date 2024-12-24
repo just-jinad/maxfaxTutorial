@@ -67,6 +67,13 @@ const QuizPage = () => {
     }));
   };
 
+  const handleTheoryAnswerChange = (questionIndex, value) => {
+    setSelectedAnswers((prevAnswers) => ({
+      ...prevAnswers,
+      [questionIndex]: value,
+    }));
+  };
+
   const handleSubmit = async () => {
     if (!studentName) {
       setError("Please enter your name before submitting the quiz.");
@@ -183,25 +190,48 @@ const QuizPage = () => {
               />
             )}
 
-            <ul>
-              {question.options.map((option, i) => (
-                <li key={i} className="mt-2">
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name={`question-${index}`}
-                      value={option}
-                      checked={selectedAnswers[index] === option}
-                      onChange={() => handleOptionChange(index, option)}
-                      className="mr-2"
-                    />
-                    <span
-                      dangerouslySetInnerHTML={{ __html: renderLatex(option) }}
-                    />
-                  </label>
-                </li>
-              ))}
-            </ul>
+            {/* Check if it's an MCQ or Theory */}
+            {question.questionType === "MCQ" ? (
+              <ul>
+                {question.options.map((option, i) => (
+                  <li key={i} className="mt-2">
+                    <label className="flex items-center">
+                      <input
+                        type="radio"
+                        name={`question-${index}`}
+                        value={option}
+                        checked={selectedAnswers[index] === option}
+                        onChange={() => handleOptionChange(index, option)}
+                        className="mr-2"
+                      />
+                      <span
+                        dangerouslySetInnerHTML={{ __html: renderLatex(option) }}
+                      />
+                    </label>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              // Display Theory question (text input)
+              <div className="mt-4">
+                <label
+                  className="block text-gray-700 font-semibold mb-2"
+                  htmlFor={`theory-answer-${index}`}
+                >
+                  Your Answer:
+                </label>
+                <textarea
+                  id={`theory-answer-${index}`}
+                  value={selectedAnswers[index] || ""}
+                  onChange={(e) =>
+                    handleTheoryAnswerChange(index, e.target.value)
+                  }
+                  placeholder="Type your answer here..."
+                  className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+                  rows="4"
+                />
+              </div>
+            )}
           </div>
         ))}
 

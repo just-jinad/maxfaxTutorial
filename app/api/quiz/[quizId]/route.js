@@ -21,7 +21,7 @@ export async function GET(request, { params }) {
       title: quiz.title,
       subject: quiz.subject,
       timeLimit: quiz.timeLimit,
-      showScoresImmediately:quiz.showScoresImmediately,
+      showScoresImmediately: quiz.showScoresImmediately,
       questions: quiz.questions.map((question) => ({
         questionText: question.questionText,
         latexEquation: question.latexEquation,
@@ -40,8 +40,6 @@ export async function GET(request, { params }) {
 }
 
 // POST request to submit answers and calculate score
-
-
 export async function POST(request, { params }) {
   // Connect to the database
   await connect();
@@ -70,7 +68,18 @@ export async function POST(request, { params }) {
     // Calculate score and determine correctness per question
     let score = 0;
     const results = quiz.questions.map((question, index) => {
-      const isCorrect = selectedAnswers[index] === question.correctAnswer;
+      let isCorrect = false;
+
+      if (question.questionType === "MCQ") {
+        // Compare selected answer with the correct answer for MCQ questions
+        isCorrect = selectedAnswers[index] === question.correctAnswer;
+      } else if (question.questionType === "Theory") {
+        // Compare Theory answers (case-insensitive and trim spaces)
+        const studentAnswer = selectedAnswers[index]?.trim().toLowerCase() || "";
+        const correctAnswer = question.correctAnswer?.trim().toLowerCase() || "";
+        isCorrect = studentAnswer === correctAnswer;
+      }
+
       if (isCorrect) score += 2; // 2 points per correct answer
       return {
         questionText: question.questionText,
@@ -107,4 +116,3 @@ export async function POST(request, { params }) {
     );
   }
 }
-
