@@ -22,6 +22,7 @@ export async function GET(request, { params }) {
       subject: quiz.subject,
       timeLimit: quiz.timeLimit,
       showScoresImmediately: quiz.showScoresImmediately,
+      optionRender: quiz.optionRender,
       questions: quiz.questions.map((question) => ({
         questionText: question.questionText,
         latexEquation: question.latexEquation,

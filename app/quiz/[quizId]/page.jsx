@@ -168,72 +168,75 @@ const QuizPage = () => {
             className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
           />
         </div>
-
         {quizData.questions.map((question, index) => (
-          <div key={index} className="mb-6 p-4 bg-white rounded shadow">
-            <span>{question.questionText}</span>
-            <h2
-              className="font-semibold text-lg mb-2"
-              dangerouslySetInnerHTML={{
-                __html: renderLatex(question.latexEquation),
-              }}
-            ></h2>
+  <div key={index} className="mb-6 p-4 bg-white rounded shadow">
+    <span>{question.questionText}</span>
+    <h2
+      className="font-semibold text-lg mb-2"
+      dangerouslySetInnerHTML={{
+        __html: renderLatex(question.latexEquation),
+      }}
+    ></h2>
 
-            {/* Display Images if Available */}
-            {question.imageUrl && (
-              <Image
-                src={question.imageUrl}
-                alt={`Question ${index + 1} - Image`}
-                width={600}
-                height={400}
-                className="rounded mx-auto"
+    {/* Display Images if Available */}
+    {question.imageUrl && (
+      <Image
+        src={question.imageUrl}
+        alt={`Question ${index + 1} - Image`}
+        width={600}
+        height={400}
+        className="rounded mx-auto"
+      />
+    )}
+
+    {/* Render Options Based on `optionRender` */}
+    {question.questionType === "MCQ" ? (
+      <ul>
+        {question.options.map((option, i) => (
+          <li key={i} className="mt-2">
+            <label className="flex items-center">
+              <input
+                type="radio"
+                name={`question-${index}`}
+                value={option}
+                checked={selectedAnswers[index] === option}
+                onChange={() => handleOptionChange(index, option)}
+                className="mr-2"
               />
-            )}
-
-            {/* Check if it's an MCQ or Theory */}
-            {question.questionType === "MCQ" ? (
-              <ul>
-                {question.options.map((option, i) => (
-                  <li key={i} className="mt-2">
-                    <label className="flex items-center">
-                      <input
-                        type="radio"
-                        name={`question-${index}`}
-                        value={option}
-                        checked={selectedAnswers[index] === option}
-                        onChange={() => handleOptionChange(index, option)}
-                        className="mr-2"
-                      />
-                      <span
-                        dangerouslySetInnerHTML={{ __html: renderLatex(option) }}
-                      />
-                    </label>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              // Display Theory question (text input)
-              <div className="mt-4">
-                <label
-                  className="block text-gray-700 font-semibold mb-2"
-                  htmlFor={`theory-answer-${index}`}
-                >
-                  Your Answer:
-                </label>
-                <textarea
-                  id={`theory-answer-${index}`}
-                  value={selectedAnswers[index] || ""}
-                  onChange={(e) =>
-                    handleTheoryAnswerChange(index, e.target.value)
-                  }
-                  placeholder="Type your answer here..."
-                  className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
-                  rows="4"
+              {/* Toggle Between Plain Text and LaTeX Rendering */}
+              {quizData.optionRender ? (
+                <span
+                  dangerouslySetInnerHTML={{ __html: renderLatex(option) }}
                 />
-              </div>
-            )}
-          </div>
+              ) : (
+                <span>{option}</span>
+              )}
+            </label>
+          </li>
         ))}
+      </ul>
+    ) : (
+      // Render Theory Question
+      <div className="mt-4">
+        <label
+          className="block text-gray-700 font-semibold mb-2"
+          htmlFor={`theory-answer-${index}`}
+        >
+          Your Answer:
+        </label>
+        <textarea
+          id={`theory-answer-${index}`}
+          value={selectedAnswers[index] || ""}
+          onChange={(e) => handleTheoryAnswerChange(index, e.target.value)}
+          placeholder="Type your answer here..."
+          className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+          rows="4"
+        />
+      </div>
+    )}
+  </div>
+))}
+
 
         {score !== null ? (
           <div>

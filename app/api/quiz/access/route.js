@@ -7,6 +7,7 @@ export async function POST(request) {
 
     try {
         const { name, pin } = await request.json();
+        console.log(name, pin);
         
         if (!name || !pin) {
             return NextResponse.json({ error: "Name and PIN are required." }, { status: 400 });
@@ -14,6 +15,7 @@ export async function POST(request) {
 
         // Fetch quiz with the matching PIN
         const quiz = await Quiz.findOne({pin} );
+        console.log(quiz);  
         if (!quiz) {
             return NextResponse.json({ error: "Invalid PIN." }, { status: 404 });
         }

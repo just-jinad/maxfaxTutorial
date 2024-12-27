@@ -23,6 +23,7 @@ const Page = () => {
   const [loading, setLoading] = useState(false);
   const [generatedPin, setGeneratedPin] = useState("");
   const [showScoresImmediately, setShowScoresImmediately] = useState(false); // New state for controlling score visibility
+  const [optionRender, setOptionRender] = useState(false); // New state for controlling score visibility
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -92,6 +93,7 @@ const Page = () => {
       timeLimit,
       attemptLimit,
       showScoresImmediately, // Include the showScoresImmediately field
+      optionRender,
     };
 
     setLoading(true);
@@ -111,6 +113,7 @@ const Page = () => {
         setTimeLimit(0);
         setAttemptLimit(0);
         setShowScoresImmediately(false); // Reset the toggle after submission
+        setOptionRender(false)
       } else {
         toast.error(data.error || "Failed to create quiz.", {
           position: "top-center",
@@ -160,7 +163,18 @@ const Page = () => {
           <span>Allow students to see their Answers immediately after submitting</span>
         </label>
       </div>
-
+      {/* Toggle for plain text o latex */}
+      <div className="mt-4">
+        <label className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            checked={optionRender}
+            onChange={() => setOptionRender(!optionRender)}
+            className="form-checkbox"
+          />
+          <span>Switch option to latex</span>
+        </label>
+      </div>
       <div className="grid grid-cols-2 md:grid-cols-2 sm:grid-cols-2 gap-3">
         <button
           onClick={addQuestion}

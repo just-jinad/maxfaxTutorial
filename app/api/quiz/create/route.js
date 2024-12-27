@@ -20,6 +20,7 @@ export async function POST(request) {
       timeLimit,
       attemptLimit,
       showScoresImmediately = false, // Set default value to false if not provided
+      optionRender = false, // Set default value to false if not provided
     } = quizData;
 
     // Validate required fields
@@ -43,6 +44,7 @@ export async function POST(request) {
       attemptLimit: attemptLimit || 1,
       showScoresImmediately, // Add the flag for showing scores immediately
       pin,
+      optionRender,
       createdAt: new Date(),
     });
 
