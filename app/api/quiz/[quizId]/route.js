@@ -3,7 +3,6 @@ import { connect } from "@/app/utils/dbConnect";
 import Quiz from "../../../models/quiz";
 import Submission from "../../../models/submission";
 
-// GET request to retrieve quiz data
 export async function GET(request, { params }) {
   await connect();
 
@@ -17,20 +16,21 @@ export async function GET(request, { params }) {
     }
 
     // Return quiz data without the correct answers
-    return NextResponse.json({
+    const quizData = {
       title: quiz.title,
       subject: quiz.subject,
       timeLimit: quiz.timeLimit,
       showScoresImmediately: quiz.showScoresImmediately,
-      optionRender: quiz.optionRender,
       questions: quiz.questions.map((question) => ({
         questionText: question.questionText,
-        latexEquation: question.latexEquation,
-        options: question.options,
-        questionType: question.questionType,
+        latexText: question.latexText, // Include latexText for proper rendering
+        options: question.options,  // Include options as they are
+        questionType: question.questionType, // Ensure the type is included
         imageUrl: question.imageUrl,
       })),
-    });
+    };
+
+    return NextResponse.json(quizData);
   } catch (error) {
     console.error("Error fetching quiz:", error);
     return NextResponse.json(
@@ -40,24 +40,20 @@ export async function GET(request, { params }) {
   }
 }
 
-// POST request to submit answers and calculate score
 export async function POST(request, { params }) {
-  // Connect to the database
   await connect();
 
   try {
     const { quizId } = params;
     const { studentName, selectedAnswers } = await request.json();
 
-    // Fetch the quiz to get correct answers and allowed attempts
     const quiz = await Quiz.findById(quizId);
     if (!quiz) {
       return NextResponse.json({ error: "Quiz not found." }, { status: 404 });
     }
 
-    // Check for existing submissions by this student for this quiz
     const studentSubmissions = await Submission.find({ quizId, studentName });
-    const maxAttempts = quiz.maxAttempts || 1; // Assume a default of 1 if not specified
+    const maxAttempts = quiz.maxAttempts || 1;
 
     if (studentSubmissions.length >= maxAttempts) {
       return NextResponse.json(
@@ -66,49 +62,59 @@ export async function POST(request, { params }) {
       );
     }
 
-    // Calculate score and determine correctness per question
     let score = 0;
     const results = quiz.questions.map((question, index) => {
       let isCorrect = false;
 
       if (question.questionType === "MCQ") {
-        // Compare selected answer with the correct answer for MCQ questions
-        isCorrect = selectedAnswers[index] === question.correctAnswer;
+        const selectedOption = question.options.find(
+          (option) => option.content === selectedAnswers[index]
+        );
+        if (selectedOption && selectedOption.isCorrect) {
+          isCorrect = true;
+          score += 2; // Increment score for correct MCQ answers
+        }
       } else if (question.questionType === "Theory") {
-        // Compare Theory answers (case-insensitive and trim spaces)
         const studentAnswer = selectedAnswers[index]?.trim().toLowerCase() || "";
         const correctAnswer = question.correctAnswer?.trim().toLowerCase() || "";
         isCorrect = studentAnswer === correctAnswer;
+
+        if (isCorrect) score += 2; // Increment score for correct theory answers
       }
 
-      if (isCorrect) score += 2; // 2 points per correct answer
       return {
         questionText: question.questionText,
-        latexEquation: question.latexEquation,
+        latexText: question.latexText,
         correctAnswer: question.correctAnswer,
         selectedAnswer: selectedAnswers[index],
         isCorrect,
       };
     });
 
-    // Save the new submission to MongoDB
     const newSubmission = await Submission.create({
       studentName,
       score,
       quizId,
-      attemptNumber: studentSubmissions.length + 1, // Track attempt number
+      attemptNumber: studentSubmissions.length + 1,
     });
-    console.log("New submission saved:", newSubmission);
 
-    // Return the calculated score, results, and attempt status
-    return NextResponse.json({
+    const response = {
       message: "Quiz submitted successfully.",
       studentName,
       score,
       totalScore: quiz.questions.length * 2,
       results,
-      remainingAttempts: maxAttempts - (studentSubmissions.length + 1), // Remaining attempts
-    });
+      remainingAttempts: maxAttempts - (studentSubmissions.length + 1),
+    };
+
+    if (quiz.showScoresImmediately) {
+      response.correctAnswers = quiz.questions.map((question) => ({
+        correctAnswer: question.correctAnswer,
+        options: question.options,
+      }));
+    }
+
+    return NextResponse.json(response);
   } catch (error) {
     console.error("Error submitting quiz:", error);
     return NextResponse.json(

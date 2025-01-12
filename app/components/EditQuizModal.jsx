@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 export default function EditQuizModal({ quiz, onClose, onUpdate }) {
   const [editedQuiz, setEditedQuiz] = useState(quiz);
@@ -14,9 +14,12 @@ export default function EditQuizModal({ quiz, onClose, onUpdate }) {
     setEditedQuiz({ ...editedQuiz, questions: updatedQuestions });
   };
 
-  const handleOptionChange = (qIndex, optIndex, value) => {
+  const handleOptionChange = (qIndex, optIndex, field, value) => {
     const updatedQuestions = [...editedQuiz.questions];
-    updatedQuestions[qIndex].options[optIndex] = value;
+    updatedQuestions[qIndex].options[optIndex] = {
+      ...updatedQuestions[qIndex].options[optIndex],
+      [field]: value,
+    };
     setEditedQuiz({ ...editedQuiz, questions: updatedQuestions });
   };
 
@@ -25,8 +28,15 @@ export default function EditQuizModal({ quiz, onClose, onUpdate }) {
       ...editedQuiz,
       questions: [
         ...editedQuiz.questions,
-        { questionText: "", options: ["", "", "", ""], correctAnswer: "", imageUrl: "", questionType: "MCQ" }
-      ]
+        {
+          questionText: "",
+          latexText: "",
+          questionType: "MCQ",
+          options: [],
+          correctAnswer: "",
+          imageUrl: "",
+        },
+      ],
     });
   };
 
@@ -35,8 +45,22 @@ export default function EditQuizModal({ quiz, onClose, onUpdate }) {
     setEditedQuiz({ ...editedQuiz, questions: updatedQuestions });
   };
 
-  const handleCheckboxChange = (e) => {
-    setEditedQuiz({ ...editedQuiz, showScoresImmediately: e.target.checked });
+  const addOption = (qIndex) => {
+    const updatedQuestions = [...editedQuiz.questions];
+    updatedQuestions[qIndex].options.push({
+      content: "",
+      type: "plain",
+      isCorrect: false,
+    });
+    setEditedQuiz({ ...editedQuiz, questions: updatedQuestions });
+  };
+
+  const removeOption = (qIndex, optIndex) => {
+    const updatedQuestions = [...editedQuiz.questions];
+    updatedQuestions[qIndex].options = updatedQuestions[qIndex].options.filter(
+      (_, i) => i !== optIndex
+    );
+    setEditedQuiz({ ...editedQuiz, questions: updatedQuestions });
   };
 
   const handleSubmit = (e) => {
@@ -90,83 +114,111 @@ export default function EditQuizModal({ quiz, onClose, onUpdate }) {
             />
           </div>
           <div>
-          <label className="block mb-1">Show Answers Immediately</label>
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              checked={editedQuiz.showScoresImmediately}
-              onChange={handleCheckboxChange}
-              className="mr-2"
-            />
-            <span>Allow students to view correct and wrong answers immediately after submission</span>
-          </div>
-        </div>
-          <div>
             <h4 className="font-bold mb-2">Questions</h4>
             {editedQuiz.questions.map((question, qIndex) => (
               <div key={qIndex} className="border p-4 mb-4 rounded">
-                <div className="mb-2">
+                <div>
                   <label className="block mb-1">Question Text</label>
                   <textarea
                     value={question.questionText}
-                    onChange={(e) => handleQuestionChange(qIndex, 'questionText', e.target.value)}
-                    className="w-full px-3 py-2 border rounded"
-                  />
-                  <label className="block mb-1">Latex Text</label>
-                     <textarea
-                    value={question.latexEquation}
-                    onChange={(e) => handleQuestionChange(qIndex, 'latexEquation', e.target.value)}
+                    onChange={(e) =>
+                      handleQuestionChange(qIndex, "questionText", e.target.value)
+                    }
                     className="w-full px-3 py-2 border rounded"
                   />
                 </div>
-                <div className="mb-2">
+                <div>
+                  <label className="block mb-1">Latex Text</label>
+                  <textarea
+                    value={question.latexText}
+                    onChange={(e) =>
+                      handleQuestionChange(qIndex, "latexText", e.target.value)
+                    }
+                    className="w-full px-3 py-2 border rounded"
+                  />
+                </div>
+                <div>
                   <label className="block mb-1">Question Type</label>
                   <select
                     value={question.questionType}
-                    onChange={(e) => handleQuestionChange(qIndex, 'questionType', e.target.value)}
+                    onChange={(e) =>
+                      handleQuestionChange(qIndex, "questionType", e.target.value)
+                    }
                     className="w-full px-3 py-2 border rounded"
                   >
                     <option value="MCQ">MCQ</option>
                     <option value="Theory">Theory</option>
                   </select>
                 </div>
-                {question.questionType === 'MCQ' && (
-                  <div className="mb-2">
-                    <label className="block mb-1">Options</label>
+                {question.questionType === "MCQ" && (
+                  <div>
+                    <h5 className="font-bold mb-2">Options</h5>
                     {question.options.map((option, optIndex) => (
-                      <input
-                        key={optIndex}
-                        type="text"
-                        value={option}
-                        onChange={(e) => handleOptionChange(qIndex, optIndex, e.target.value)}
-                        className="w-full px-3 py-2 border rounded mb-2"
-                        placeholder={`Option ${optIndex + 1}`}
-                      />
+                      <div key={optIndex} className="mb-2">
+                        <input
+                          type="text"
+                          value={option.content}
+                          onChange={(e) =>
+                            handleOptionChange(qIndex, optIndex, "content", e.target.value)
+                          }
+                          className="w-full px-3 py-2 border rounded mb-2"
+                          placeholder={`Option ${optIndex + 1}`}
+                        />
+                        <select
+                          value={option.type}
+                          onChange={(e) =>
+                            handleOptionChange(qIndex, optIndex, "type", e.target.value)
+                          }
+                          className="w-full px-3 py-2 border rounded mb-2"
+                        >
+                          <option value="plain">Plain</option>
+                          <option value="latex">Latex</option>
+                        </select>
+                        <label className="inline-flex items-center">
+                          <input
+                            type="checkbox"
+                            checked={option.isCorrect}
+                            onChange={(e) =>
+                              handleOptionChange(qIndex, optIndex, "isCorrect", e.target.checked)
+                            }
+                            className="mr-2"
+                          />
+                          Correct
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => removeOption(qIndex, optIndex)}
+                          className="bg-red-500 text-white px-2 py-1 rounded ml-2"
+                        >
+                          Remove Option
+                        </button>
+                      </div>
                     ))}
-                    <div>
-                      <label className="block mb-1">Correct Answer</label>
-                      <input
-                        type="text"
-                        value={question.correctAnswer}
-                        onChange={(e) => handleQuestionChange(qIndex, 'correctAnswer', e.target.value)}
-                        className="w-full px-3 py-2 border rounded"
-                      />
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => addOption(qIndex)}
+                      className="bg-green-500 text-white px-4 py-2 rounded"
+                    >
+                      Add Option
+                    </button>
                   </div>
                 )}
-                <div className="mb-2">
-                  <label className="block mb-1">Image URL (optional)</label>
-                  <input
-                    type="text"
-                    value={question.imageUrl}
-                    onChange={(e) => handleQuestionChange(qIndex, 'imageUrl', e.target.value)}
-                    className="w-full px-3 py-2 border rounded"
-                  />
-                </div>
+                {question.questionType === "Theory" && (
+                  <div>
+                    <label className="block mb-1">Correct Answer</label>
+                    <textarea
+                      value={question.correctAnswer}
+                      onChange={(e) =>
+                        handleQuestionChange(qIndex, "correctAnswer", e.target.value)
+                      }
+                      className="w-full px-3 py-2 border rounded"
+                    />
+                  </div>
+                )}
                 <button
                   type="button"
                   onClick={() => removeQuestion(qIndex)}
-                  className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
+                  className="bg-red-500 text-white px-2 py-1 rounded mt-2"
                 >
                   Remove Question
                 </button>
@@ -175,7 +227,7 @@ export default function EditQuizModal({ quiz, onClose, onUpdate }) {
             <button
               type="button"
               onClick={addQuestion}
-              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+              className="bg-green-500 text-white px-4 py-2 rounded"
             >
               Add Question
             </button>
@@ -184,13 +236,13 @@ export default function EditQuizModal({ quiz, onClose, onUpdate }) {
             <button
               type="button"
               onClick={onClose}
-              className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400"
+              className="bg-gray-300 text-black px-4 py-2 rounded"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              className="bg-blue-500 text-white px-4 py-2 rounded"
             >
               Save Changes
             </button>
@@ -200,4 +252,3 @@ export default function EditQuizModal({ quiz, onClose, onUpdate }) {
     </div>
   );
 }
-

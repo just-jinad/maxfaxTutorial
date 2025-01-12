@@ -1,9 +1,9 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import Image from "next/image";
 import katex from "katex";
 import "katex/dist/katex.min.css";
+import Image from "next/image";
 
 const QuizPage = () => {
   const router = useRouter();
@@ -18,7 +18,7 @@ const QuizPage = () => {
   const [loading, setLoading] = useState(false);
   const [remainingAttempts, setRemainingAttempts] = useState(null);
   const [showScoresImmediately, setShowScoresImmediately] = useState(false);
-  const [showAnswers, setShowAnswers] = useState(false);
+  const [isTimeUp, setIsTimeUp] = useState(false); // Flag to track time-up
 
   useEffect(() => {
     const fetchQuiz = async () => {
@@ -28,7 +28,7 @@ const QuizPage = () => {
 
         if (response.ok) {
           setQuizData(data);
-          setRemainingTime(data.timeLimit * 60);
+          setRemainingTime(data.timeLimit * 60); // Convert minutes to seconds
           setRemainingAttempts(data.remainingAttempts);
           setShowScoresImmediately(data.showScoresImmediately);
         } else {
@@ -49,10 +49,11 @@ const QuizPage = () => {
         setRemainingTime((prevTime) => prevTime - 1);
       }, 1000);
       return () => clearInterval(timer);
-    } else if (remainingTime === 0) {
-      handleSubmit();
+    } else if (remainingTime === 0 && !isTimeUp) {
+      setIsTimeUp(true);
+      handleSubmit(); // Auto-submit when time runs out
     }
-  }, [remainingTime]);
+  }, [remainingTime, isTimeUp]);
 
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
@@ -80,9 +81,7 @@ const QuizPage = () => {
       return;
     }
     if (remainingAttempts <= 0) {
-      setError(
-        "You have reached the maximum number of attempts for this quiz."
-      );
+      setError("You have reached the maximum number of attempts for this quiz.");
       return;
     }
 
@@ -91,9 +90,7 @@ const QuizPage = () => {
     try {
       const response = await fetch(`/api/quiz/${quizId}`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ studentName, selectedAnswers }),
       });
 
@@ -102,9 +99,6 @@ const QuizPage = () => {
         setScore(result.score);
         setResults(result.results);
         setRemainingAttempts(result.remainingAttempts);
-
-        // Show answers only if the toggle is enabled
-        setShowAnswers(showScoresImmediately);
       } else {
         setError(result.error || "Failed to submit quiz.");
       }
@@ -136,16 +130,13 @@ const QuizPage = () => {
   return (
     <div className="min-h-screen p-6 bg-gray-50">
       <div className="max-w-lg mx-auto">
-        <h1 className="text-3xl font-bold text-center mb-4">
-          {quizData.title}
-        </h1>
+        <h1 className="text-3xl font-bold text-center mb-4">{quizData.title}</h1>
         <h2 className="text-xl text-center text-gray-700 mb-6">
           Subject: {quizData.subject}
         </h2>
         <h2 className="text-center text-gray-700 mb-6">
           Time Remaining: {formatTime(remainingTime)}
         </h2>
-
         <div className="text-center mb-4">
           <p className="text-gray-700 font-semibold">
             Remaining Attempts: {remainingAttempts}
@@ -153,10 +144,7 @@ const QuizPage = () => {
         </div>
 
         <div className="mb-4">
-          <label
-            className="block text-gray-700 font-semibold mb-2"
-            htmlFor="studentName"
-          >
+          <label className="block text-gray-700 font-semibold mb-2" htmlFor="studentName">
             Enter your name:
           </label>
           <input
@@ -168,132 +156,83 @@ const QuizPage = () => {
             className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
           />
         </div>
+
         {quizData.questions.map((question, index) => (
-  <div key={index} className="mb-6 p-4 bg-white rounded shadow">
-    <span>{question.questionText}</span>
-    <h2
-      className="font-semibold text-lg mb-2"
-      dangerouslySetInnerHTML={{
-        __html: renderLatex(question.latexEquation),
-      }}
-    ></h2>
+          <div key={index} className="mb-6 p-4 bg-white rounded shadow">
+            <span>{question.questionText}</span>
+            <h2
+              className="font-semibold text-lg mb-2"
+              dangerouslySetInnerHTML={{
+                __html: renderLatex(question.latexText),
+              }}
+            ></h2>
 
-    {/* Display Images if Available */}
-    {question.imageUrl && (
-      <Image
-        src={question.imageUrl}
-        alt={`Question ${index + 1} - Image`}
-        width={600}
-        height={400}
-        className="rounded mx-auto"
-      />
-    )}
-
-    {/* Render Options Based on `optionRender` */}
-    {question.questionType === "MCQ" ? (
-      <ul>
-        {question.options.map((option, i) => (
-          <li key={i} className="mt-2">
-            <label className="flex items-center">
-              <input
-                type="radio"
-                name={`question-${index}`}
-                value={option}
-                checked={selectedAnswers[index] === option}
-                onChange={() => handleOptionChange(index, option)}
-                className="mr-2"
+            {question.imageUrl && (
+              <Image
+                src={question.imageUrl}
+                alt="Question Image"
+                width={500}
+                height={500}
+                className="mb-4"
               />
-              {/* Toggle Between Plain Text and LaTeX Rendering */}
-              {quizData.optionRender ? (
-                <span
-                  dangerouslySetInnerHTML={{ __html: renderLatex(option) }}
-                />
-              ) : (
-                <span>{option}</span>
-              )}
-            </label>
-          </li>
-        ))}
-      </ul>
-    ) : (
-      // Render Theory Question
-      <div className="mt-4">
-        <label
-          className="block text-gray-700 font-semibold mb-2"
-          htmlFor={`theory-answer-${index}`}
-        >
-          Your Answer:
-        </label>
-        <textarea
-          id={`theory-answer-${index}`}
-          value={selectedAnswers[index] || ""}
-          onChange={(e) => handleTheoryAnswerChange(index, e.target.value)}
-          placeholder="Type your answer here..."
-          className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
-          rows="4"
-        />
-      </div>
-    )}
-  </div>
-))}
+            )}
 
-
-        {score !== null ? (
-          <div>
-            <p className="text-center text-xl font-semibold mt-4">
-              Your Score: {score} / {quizData.questions.length * 2}
-            </p>
-
-            {/* Show/Hide Answers Toggle */}
-            {showAnswers && (
-              <div className="mt-6">
-                {results.map((result, index) => (
-                  <div key={index} className="mb-4">
-                    <h3
-                      className="font-semibold"
+            {question.questionType === "MCQ" ? (
+              question.options.map((option, optionIndex) => (
+                <div key={optionIndex} className="mb-2">
+                  <label>
+                    <input
+                      type="radio"
+                      name={`question-${index}`}
+                      value={option.content}
+                      onChange={() => handleOptionChange(index, option.content)}
+                      disabled={score !== null}
+                    />
+                    <span
                       dangerouslySetInnerHTML={{
-                        __html: renderLatex(result.questionText),
+                        __html: option.type === "latex" ? renderLatex(option.content) : option.content,
                       }}
-                    ></h3>
-                    <p>
-                      Your Answer:{" "}
-                      <span
-                        className={
-                          result.isCorrect
-                            ? "text-green-500"
-                            : "text-red-500"
-                        }
-                        dangerouslySetInnerHTML={{
-                          __html: renderLatex(
-                            result.selectedAnswer || "No answer selected"
-                          ),
-                        }}
-                      />
-                    </p>
-                    {!result.isCorrect && (
-                      <p className="text-gray-700">
-                        Correct Answer:{" "}
-                        <span
-                          className="text-green-500"
-                          dangerouslySetInnerHTML={{
-                            __html: renderLatex(result.correctAnswer),
-                          }}
-                        />
-                      </p>
-                    )}
-                  </div>
-                ))}
+                    ></span>
+                  </label>
+                </div>
+              ))
+            ) : (
+              <textarea
+                value={selectedAnswers[index] || ""}
+                onChange={(e) => handleTheoryAnswerChange(index, e.target.value)}
+                className="w-full px-4 py-2 border rounded-md"
+                disabled={score !== null}
+              />
+            )}
+
+            {/* Show Correct Answers only if not time-up */}
+            {showScoresImmediately && results && !isTimeUp && (
+              <div>
+                <p>
+                  <strong>Correct Answer: </strong>
+                  {question.questionType === "MCQ"
+                    ? question.options.find((option) => option.isCorrect)?.content
+                    : question.correctAnswer}
+                </p>
               </div>
             )}
           </div>
-        ) : (
+        ))}
+
+        <div className="text-center mt-6">
           <button
-            className="w-full mt-4 py-2 px-4 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
             onClick={handleSubmit}
-            disabled={loading}
+            disabled={loading || remainingAttempts <= 0 || isTimeUp}
+            className="px-6 py-2 bg-blue-500 text-white rounded-md"
           >
             {loading ? "Submitting..." : "Submit Quiz"}
           </button>
+        </div>
+
+        {score !== null && (
+          <div className="mt-4">
+            <h3 className="text-xl font-semibold">Your Score: {score}</h3>
+          </div>
         )}
       </div>
     </div>
