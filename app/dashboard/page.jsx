@@ -12,7 +12,21 @@ import {
   Bell,
   Search,
   PlusCircle,
+  Menu, // Hamburger icon for mobile
+  X,    // Close icon for mobile sidebar
 } from "lucide-react";
+import Link from "next/link";
+import {
+  LineChart,
+  Line,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip as RechartsTooltip,
+  ResponsiveContainer,
+} from "recharts";
+import Calendar from "react-calendar";
+import "react-calendar/dist/Calendar.css";
 
 // Existing component imports remain unchanged
 import QuizForm from "../components/dashboard/QuizForm";
@@ -20,10 +34,32 @@ import Question from "../components/dashboard/Question";
 import QuizSubmitButton from "../components/dashboard/QuizSubmitButton";
 import QuizOptionsToggle from "../components/dashboard/QuizOptionsToggle";
 import ToggleCheckbox from "../components/dashboard/ToggleCheckbox";
-import Link from "next/link";
+
+// -------------------------
+// Real Calendar Component
+// -------------------------
+const RealCalendar = () => {
+  const [date, setDate] = useState(new Date());
+  return (
+    <div className="bg-white shadow rounded p-4">
+      <h2 className="text-lg font-bold mb-4">Calendar</h2>
+      <Calendar onChange={setDate} value={date} className="w-full" />
+    </div>
+  );
+};
+
+// -------------------------
+// Sample Data for Recharts
+// -------------------------
+const sampleData = [
+  { name: "Quiz 1", submissions: 30 },
+  { name: "Quiz 2", submissions: 50 },
+  { name: "Quiz 3", submissions: 40 },
+  { name: "Quiz 4", submissions: 70 },
+  { name: "Quiz 5", submissions: 20 },
+];
 
 const Page = () => {
-  // Entire existing component logic remains EXACTLY the same
   const router = useRouter();
   const [quizTitle, setQuizTitle] = useState("");
   const [subject, setSubject] = useState("");
@@ -35,7 +71,9 @@ const Page = () => {
   const [showScoresImmediately, setShowScoresImmediately] = useState(false);
   const [optionRender, setOptionRender] = useState(false);
 
-  // All existing methods (useEffect, addQuestion, handleQuestionChange, etc.) remain unchanged
+  // State to toggle the mobile sidebar
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -94,7 +132,6 @@ const Page = () => {
 
   const handleImageUpload = async (qIndex, file) => {
     if (!file) return;
-
     const formData = new FormData();
     formData.append("file", file);
     formData.append("upload_preset", "your_upload_preset");
@@ -107,13 +144,16 @@ const Page = () => {
       const data = await response.json();
       console.log(data);
       if (response.ok) {
-        console.log("image link " + data.url);
         const updatedQuestions = [...questions];
         updatedQuestions[qIndex].imageUrl = data.url;
         setQuestions(updatedQuestions);
-        toast.success("Image uploaded successfully.");
+        toast.success("Image uploaded successfully.",{
+          position: "top-center"
+        });
       } else {
-        toast.error("Failed to upload image.");
+        toast.error("Failed to upload image.", {
+          position: "top-center"
+        });
       }
     } catch (error) {
       console.error("Image upload error:", error);
@@ -123,12 +163,11 @@ const Page = () => {
 
   const handleSubmit = async () => {
     if (!quizTitle || !subject || questions.length === 0) {
-      toast.error(
-        "Please fill in all required fields and add at least one question."
-      );
+      toast.error("Please fill in all required fields and add at least one question.",{
+        position:"top-center"
+      });
       return;
     }
-
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
@@ -150,9 +189,10 @@ const Page = () => {
 
       if (response.ok) {
         const data = await response.json();
-        setGeneratedPin(data.pin); // Access the pin here from the response
-
-        toast.success("Quiz created successfully!");
+        setGeneratedPin(data.pin);
+        toast.success("Quiz created successfully!",{
+          position:"top-center"
+        });
         setQuizTitle("");
         setSubject("");
         setQuestions([]);
@@ -161,7 +201,9 @@ const Page = () => {
         setShowScoresImmediately(false);
       } else {
         const errorData = await response.json();
-        toast.error(errorData.message || "Failed to create the quiz.");
+        toast.error(errorData.message || "Failed to create the quiz.",{
+          position:"top-center"
+        });
       }
     } catch (error) {
       console.error("Submission error:", error);
@@ -170,10 +212,50 @@ const Page = () => {
       setLoading(false);
     }
   };
+
   return (
-    <div className="flex min-h-screen bg-purple-50">
-      {/* Sidebar */}
-      <aside className="w-24 bg-purple-600 text-white p-4 flex flex-col items-center">
+    <div className="flex flex-col md:flex-row min-h-screen bg-purple-50">
+      {/* Mobile Sidebar Overlay */}
+      {sidebarOpen && (
+        <div className="fixed inset-0 z-40 flex">
+          <div
+            className="fixed inset-0 bg-black opacity-50"
+            onClick={() => setSidebarOpen(false)}
+          ></div>
+          <aside className="relative z-50 w-64 bg-purple-600 text-white p-4">
+            <div className="flex justify-end mb-4">
+              <button onClick={() => setSidebarOpen(false)}>
+                <X size={24} />
+              </button>
+            </div>
+            <nav className="space-y-6">
+              <button className="flex items-center space-x-2 text-white hover:bg-purple-700 p-2 rounded w-full">
+                <LayoutDashboard size={20} />
+                <span>Dashboard</span>
+              </button>
+              <button className="flex items-center space-x-2 text-white hover:bg-purple-700 p-2 rounded w-full">
+                <BookOpen size={20} />
+                <span>Quizzes</span>
+              </button>
+              <button className="flex items-center space-x-2 text-white hover:bg-purple-700 p-2 rounded w-full">
+                <Users size={20} />
+                <span>Users</span>
+              </button>
+              <button className="flex items-center space-x-2 text-white hover:bg-purple-700 p-2 rounded w-full">
+                <CalendarIcon size={20} />
+                <span>Calendar</span>
+              </button>
+              <button className="flex items-center space-x-2 text-white hover:bg-purple-700 p-2 rounded w-full">
+                <Settings size={20} />
+                <span>Settings</span>
+              </button>
+            </nav>
+          </aside>
+        </div>
+      )}
+
+      {/* Desktop Sidebar */}
+      <aside className="hidden md:flex md:flex-col md:w-24 bg-purple-600 text-white p-4 items-center">
         <div className="mb-8">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -185,31 +267,55 @@ const Page = () => {
           </svg>
         </div>
         <nav className="space-y-6">
-          <button className="text-white hover:bg-purple-700 p-2 rounded">
+          <button className="relative group text-white hover:bg-purple-700 p-2 rounded">
             <LayoutDashboard size={20} />
+            <span className="absolute left-full ml-2 hidden group-hover:block bg-gray-800 text-white p-1 rounded text-xs">
+              Dashboard
+            </span>
           </button>
-          <button className="text-white hover:bg-purple-700 p-2 rounded">
+          <button className="relative group text-white hover:bg-purple-700 p-2 rounded">
             <BookOpen size={20} />
+            <span className="absolute left-full ml-2 hidden group-hover:block bg-gray-800 text-white p-1 rounded text-xs">
+              Quizzes
+            </span>
           </button>
-          <button className="text-white hover:bg-purple-700 p-2 rounded">
+          <button className="relative group text-white hover:bg-purple-700 p-2 rounded">
             <Users size={20} />
+            <span className="absolute left-full ml-2 hidden group-hover:block bg-gray-800 text-white p-1 rounded text-xs">
+              Users
+            </span>
           </button>
-          <button className="text-white hover:bg-purple-700 p-2 rounded">
+          <button className="relative group text-white hover:bg-purple-700 p-2 rounded">
             <CalendarIcon size={20} />
+            <span className="absolute left-full ml-2 hidden group-hover:block bg-gray-800 text-white p-1 rounded text-xs">
+              Calendar
+            </span>
           </button>
-          <button className="text-white hover:bg-purple-700 p-2 rounded">
+          <button className="relative group text-white hover:bg-purple-700 p-2 rounded">
             <Settings size={20} />
+            <span className="absolute left-full ml-2 hidden group-hover:block bg-gray-800 text-white p-1 rounded text-xs">
+              Settings
+            </span>
           </button>
         </nav>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-8">
+      <div className="flex-1 p-4 md:p-8">
         {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-2xl font-bold">Quiz Creation Dashboard</h1>
-            <p className="text-gray-600">Create and manage your quizzes</p>
+        <header className="flex items-center justify-between mb-8">
+          <div className="flex items-center space-x-4">
+            {/* Hamburger Menu for Mobile */}
+            <button
+              className="md:hidden p-2 bg-purple-600 text-white rounded"
+              onClick={() => setSidebarOpen(true)}
+            >
+              <Menu size={24} />
+            </button>
+            <div>
+              <h1 className="text-2xl font-bold">Quiz Creation Dashboard</h1>
+              <p className="text-gray-600">Create and manage your quizzes</p>
+            </div>
           </div>
           <div className="flex items-center space-x-4">
             <div className="relative">
@@ -231,10 +337,27 @@ const Page = () => {
             </button>
             <div className="w-10 h-10 bg-purple-200 rounded-full"></div>
           </div>
-        </div>
+        </header>
 
-        {/* Original Dashboard Content - EXACTLY as it was */}
-        <div className="space-y-6">
+        {/* Calendar & Chart Section */}
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <RealCalendar />
+          <div className="bg-white shadow rounded p-4">
+            <h2 className="text-lg font-bold mb-4">Quiz Submissions Chart</h2>
+            <ResponsiveContainer width="100%" height={200}>
+              <LineChart data={sampleData}>
+                <CartesianGrid stroke="#ccc" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <RechartsTooltip />
+                <Line type="monotone" dataKey="submissions" stroke="#8884d8" />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </section>
+
+        {/* Original Dashboard Content */}
+        <section className="space-y-6">
           <QuizForm
             quizTitle={quizTitle}
             setQuizTitle={setQuizTitle}
@@ -279,18 +402,18 @@ const Page = () => {
             </Link>
             <Link
               href="/admin"
-              className="px-4 py-2 text-center  bg-white text-purple-400 hover:bg-purple-400 hover:text-white font-bold rounded-md mb-4"
+              className="px-4 py-2 text-center bg-white text-purple-400 hover:bg-purple-400 hover:text-white font-bold rounded-md mb-4"
             >
               Edit/Delete
             </Link>
           </div>
           {generatedPin && (
-            <div className="p-5 bg-purple-500 font-bold text-white mb-4 rounded-md">
+            <div className="p-5 bg-purple-500 font-bold text-center text-white mb-4 rounded-md">
               Generated PIN: {generatedPin}
             </div>
           )}
-        </div>
-      </main>
+        </section>
+      </div>
     </div>
   );
 };
