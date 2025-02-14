@@ -303,41 +303,40 @@ const Page = () => {
       {/* Main Content */}
       <div className="flex-1 p-4 md:p-8">
         {/* Header */}
-        <header className="flex items-center justify-between mb-8">
-          <div className="flex items-center space-x-4">
-            {/* Hamburger Menu for Mobile */}
-            <button
-              className="md:hidden p-2 bg-purple-600 text-white rounded"
-              onClick={() => setSidebarOpen(true)}
-            >
-              <Menu size={24} />
-            </button>
-            <div>
-              <h1 className="text-2xl font-bold">Quiz Creation Dashboard</h1>
-              <p className="text-gray-600">Create and manage your quizzes</p>
-            </div>
-          </div>
-          <div className="flex items-center space-x-4">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search Quizzes..."
-                className="pl-10 pr-4 py-2 rounded-full w-64 border"
-              />
-              <Search
-                className="absolute left-3 top-3 text-gray-400"
-                size={20}
-              />
-            </div>
-            <button className="bg-white p-2 rounded-full relative">
-              <Bell size={20} />
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full px-1.5 py-0.5 text-xs">
-                3
-              </span>
-            </button>
-            <div className="w-10 h-10 bg-purple-200 rounded-full"></div>
-          </div>
-        </header>
+        <header className="flex flex-col sm:flex-row items-center justify-between mb-8 sm:mb-4">
+  <div className="flex items-center justify-between sm:space-x-6 w-full sm:w-auto">
+    {/* Hamburger Menu for Mobile */}
+    <button
+      className="md:hidden p-2 bg-purple-600 text-white rounded"
+      onClick={() => setSidebarOpen(true)}
+    >
+      <Menu size={24} />
+    </button>
+    <div className="text-center sm:text-left w-full sm:w-auto">
+      <h1 className="text-2xl sm:text-xl font-bold">Quiz Creation Dashboard</h1>
+      <p className="text-gray-600 sm:text-lg">Create and manage your quizzes</p>
+    </div>
+  </div>
+
+  <div className="flex items-center justify-between sm:justify-end space-x-4 sm:space-x-6 mt-4 sm:mt-0 w-full sm:w-auto">
+    <div className="relative flex-grow sm:w-64">
+      <input
+        type="text"
+        placeholder="Search Quizzes..."
+        className="pl-10 pr-4 py-2 rounded-full w-full border"
+      />
+      <Search className="absolute left-3 top-3 text-gray-400" size={20} />
+    </div>
+    <button className="bg-white p-2 rounded-full relative">
+      <Bell size={20} />
+      <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full px-1.5 py-0.5 text-xs">
+        3
+      </span>
+    </button>
+    <div className="w-10 h-10 bg-purple-200 rounded-full"></div>
+  </div>
+</header>
+
 
         {/* Calendar & Chart Section */}
         <section className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
