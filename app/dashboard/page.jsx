@@ -313,8 +313,8 @@ const Page = () => {
       <Menu size={24} />
     </button>
     <div className="text-center sm:text-left w-full sm:w-auto">
-      <h1 className="text-xl font-bold">Quiz Creation Dashboard</h1>
-      <p className="text-gray-600 sm:text-lg">Create and manage your quizzes</p>
+      <h1 className="text-xl sm:text-sm font-bold">Quiz Creation Dashboard</h1>
+      <p className="text-gray-600 sm:text-sm">Create and manage your quizzes</p>
     </div>
   </div>
 
