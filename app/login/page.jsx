@@ -3,6 +3,7 @@ import axios from "axios";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
+import Link from "next/link";
 
 const Page = () => {
   const router = useRouter();
@@ -31,12 +32,11 @@ const Page = () => {
       .catch((err) => {
         console.log(err);
         console.log(err.response.data.error);
-        // console.log(err.response?.status)
         const errorMessage = err.response.data.error;
 
         toast.error(errorMessage, {
           position: "top-center",
-          style: { backgroundColor: "red", color: "white" }, // Custom error styling
+          style: { backgroundColor: "red", color: "white" },
         });
       });
   };
@@ -44,12 +44,10 @@ const Page = () => {
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
       {/* Left Section (only visible on medium and larger screens) */}
-      <div className="hidden md:flex w-1/2 bg-white text-teal-900 flex-col justify-center items-center p-10">
-        <h1 className="text-5xl font-bold mb-6">Maxfax Tutorial</h1>
+      <div className="hidden md:flex w-full md:w-1/2 bg-purple-800 text-white flex-col justify-center items-center p-10">
+        <h1 className="text-5xl font-bold mb-6">cbtapp</h1>
         <p className="text-lg max-w-md text-center leading-relaxed">
-          Empower your learning journey with Maxfax! Join us for expertly guided
-          tutorials designed to help you achieve your goals and expand your
-          knowledge base.
+          Empower your learning journey with cbtapp! Join us for expertly guided tutorials designed to help you achieve your goals and expand your knowledge base.
         </p>
       </div>
 
@@ -59,17 +57,17 @@ const Page = () => {
           onSubmit={handleLogin}
           className="w-full max-w-md bg-white shadow-lg p-10 rounded-lg"
         >
-          <h5 className="text-3xl font-semibold mb-6 text-teal-800 text-center">
+          <h5 className="text-3xl font-semibold mb-6 text-purple-800 text-center">
             Welcome Back
           </h5>
 
           {/* Username Field */}
           <div className="mb-4">
-            <label className="block text-teal-800 mb-2" htmlFor="username">
+            <label className="block text-purple-800 mb-2" htmlFor="username">
               Username:
             </label>
             <input
-              className="w-full px-4 py-2 rounded-lg border border-teal-200 placeholder-teal-400 focus:outline-none focus:ring-2 focus:ring-teal-500"
+              className="w-full px-4 py-2 rounded-lg border border-purple-200 placeholder-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
               id="username"
               required
               placeholder="Enter your username"
@@ -80,11 +78,11 @@ const Page = () => {
 
           {/* Password Field */}
           <div className="mb-6">
-            <label className="block text-teal-800 mb-2" htmlFor="password">
+            <label className="block text-purple-800 mb-2" htmlFor="password">
               Password:
             </label>
             <input
-              className="w-full px-4 py-2 rounded-lg border border-teal-200 placeholder-teal-400 focus:outline-none focus:ring-2 focus:ring-teal-500"
+              className="w-full px-4 py-2 rounded-lg border border-purple-200 placeholder-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
               id="password"
               type="password"
               required
@@ -97,10 +95,15 @@ const Page = () => {
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full py-2 bg-teal-700 text-white font-semibold rounded-lg hover:bg-teal-600 transition duration-300"
+            className="w-full py-2 bg-purple-700 text-white font-semibold rounded-lg hover:bg-purple-600 transition duration-300"
           >
             Login
           </button>
+          <br />
+          <br />
+          <span className="mt-10 text-center">Don't have an account</span> 
+          <br />
+          <Link href="/signup" className="underline mt-4">Signup here</Link>
         </form>
       </div>
     </div>
